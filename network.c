@@ -115,9 +115,11 @@ for(i = n->nbLayers - 2; i > 0; i--){
    for(j = 0; j < l.nbNeurons; j++){
      nr = l.neurons[j];
      sp = sigmoid_prime(nr.z);
-
-  // delta = np.dot(weights[-l+1].transpose(),delta) ???
-
+     delta = 0;
+     for(k = 0; k < n->layers[i+1].nbNeurons; k++){
+	delta += n->layers[i+1].neurons[k].weights[j]
+		 * n->layers[i+1].neurons[k].nabla_b;
+     }
      delta *= sp;
      nr.delta_nabla_b = delta;
      for(k = 0; k < nr.nbInputs; k++){
