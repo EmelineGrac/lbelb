@@ -63,19 +63,81 @@ int evaluate(struct Network n, float **inputs,
 	return res;
 }
 
-/*void SGD(struct Network* n, struct TrainingData* td, int epochs,
-int mini_batch_size, float eta){
-//TODO
-	struct TrainingData* mini_batches =
-		malloc(;
-	for(int j = 0; j < epochs; j++){
-		// random.shuffle(td);
-		for(int k = 0; k < size_td; k += mini_batch_size){
-			mini_batches.append(training_data[k:k+mini_batch_size])
-		}
-	}
+void backprop(float* trainingInputs, float desiredOutput){
+/* TODO
+Update delta_nabla_bw
+*/
 }
-}*/
+
+void update_mini_batch(struct Network* n, struct TrainingData* k,
+struct TrainingData* k_end, float eta){
+
+/*
+Update the network's weights and biases
+by applying gradient descent using backpropagation
+to a single mini batch.
+The mini_batch is an array of struct TrainingData
+eta is the learning rate.
+ */
+
+ int i, j, kk;
+ size_t len = k_end - k;
+ // printNetwork(*n);
+
+  for (i = 0; i < n->nbLayers; i++){
+    for (j = 0; j < n->layers[i].nbNeurons; j++){
+      n->layers[i].neurons[j].nabla_b = 100;//test
+      for(kk = 0; kk < n->layers[i].neurons[j].nbInputs;kk++)
+        n->layers[i].neurons[j].nabla_w[kk] = 100;//test
+    }
+  }
+
+for(; k < k_end; k++){
+  backprop((*k).trainingInputs,(*k).desiredOutput);
+
+  for (i = 0; i < n->nbLayers; i++){
+    for (j = 0; j < n->layers[i].nbNeurons; j++){
+      n->layers[i].neurons[j].nabla_b
+	 += n->layers[i].neurons[j].delta_nabla_b;
+      for(kk = 0; kk < n->layers[i].neurons[j].nbInputs;kk++)
+        n->layers[i].neurons[j].nabla_w[kk]
+	 += n->layers[i].neurons[j].delta_nabla_w[kk];
+    }
+  }
+}
+
+struct Neuron* nr;
+
+  for (i = 0; i < n->nbLayers; i++){
+    for (j = 0; j < n->layers[i].nbNeurons; j++){
+      nr = &(n->layers[i].neurons[j]);
+      nr->bias = nr->bias - (eta/len) * (nr->nabla_b);
+      for(kk = 0; kk < n->layers[i].neurons[j].nbInputs;kk++)
+        nr->weights[kk] = nr->weights[kk] - (eta/len) * (nr->nabla_w[kk]);
+    }
+  }
+}
+
+void SGD(struct Network* n, struct TrainingData* td,
+	 size_t size_td, int epochs, int mini_batch_size,
+	 float eta){
+/*
+td is a list of struct TrainingData(trainingInputs[],desiredOutput)
+One epoch consists of one full training cycle on the training set.
+Once every sample in the set is seen, you start again,
+marking the beginning of the 2nd epoch.
+mini_batch_size is the size of one sample.
+eta is the learning rate.
+*/
+  for(int j = 0; j < epochs; j++){
+	// random.shuffle(td);
+	struct TrainingData* k = td;
+	struct TrainingData* k_end = td + size_td;
+	for(; k < k_end; k += mini_batch_size)
+		update_mini_batch(n,k,k+mini_batch_size,eta);
+  }
+}
+
 
 void initNeuron(struct Neuron* _neuron, float _bias, int _nbInputs)
 {
@@ -210,15 +272,18 @@ int main(int argc, char *argv[])
 
 	printNetwork(network);
 
-	float _testInputs[] = {1.0,0.0};
-	float _testInputs2[] = {0.0,0.0};
+	float _testInputs00[] = {0.0,0.0};
+	float _testInputs01[] = {0.0,1.0};
+	float _testInputs10[] = {1.0,0.0};
+	float _testInputs11[] = {1.0,1.0};
+
 	float *res = calloc(1, sizeof(float));
 	float *res2 = calloc(1, sizeof(float));
-	res = feedforward(network, 1, _testInputs);
-	res2 = feedforward(network, 1, _testInputs2);
-	printf("%f XOR %f\n", _testInputs[0], _testInputs[1]);
+	res = feedforward(network, 1, _testInputs10);
+	res2 = feedforward(network, 1, _testInputs00);
+	printf("%f XOR %f\n", _testInputs10[0], _testInputs10[1]);
 	printf("= %f\n", res[0]);
-	printf("%f XOR %f\n", _testInputs2[0], _testInputs2[1]);
+	printf("%f XOR %f\n", _testInputs00[0], _testInputs00[1]);
 	printf("= %f\n", res2[0]);
 
 	/*size_t lenTest = 1;
@@ -228,7 +293,45 @@ int main(int argc, char *argv[])
 	testOutputs[0] = 0;
 	printf("evaluate : %d\n",
 		 evaluate(network, testInputs, testOutputs, lenTest));*/
-	printf("Result (index output) = %d\n", test(network, _testInputs));
+	printf("Result (index output) = %d\n", test(network, _testInputs00));
+
+	printf("Test SGD :\n");
+
+	size_t size_td = 4;
+	struct TrainingData* td = malloc(size_td * sizeof(struct TrainingData));
+
+	struct TrainingData td1;
+	td1.trainingInputs = _testInputs00;
+	td1.desiredOutput = 0;
+
+	struct TrainingData td2;
+	td2.trainingInputs = _testInputs01;
+	td2.desiredOutput = 1;
+
+	struct TrainingData td3;
+	td3.trainingInputs = _testInputs10;
+	td3.desiredOutput = 1;
+
+	struct TrainingData td4;
+	td4.trainingInputs = _testInputs11;
+	td4.desiredOutput = 0;
+
+	td[0] = td1;
+	td[1] = td2;
+	td[2] = td3;
+	td[3] = td4;
+
+	int epochs = 20;
+	int mini_batch_size = 2;
+	float eta = 2.0;
+
+	SGD(&network, td, size_td, epochs, mini_batch_size, eta);
+
+	printf(" Size of TrainingData = %zu\n %d epochs\n \
+mini_batch_size = %d\n eta = %f\n",
+	size_td, epochs, mini_batch_size, eta);
+	printNetwork(network);
+
 	printf("End\n");
 	return 0;
 }

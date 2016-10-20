@@ -31,3 +31,5 @@ struct TrainingData
 	float* trainingInputs;
 	float desiredOutput;
 };
+
+void printNetwork(struct Network);
