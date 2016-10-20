@@ -11,6 +11,8 @@ struct Neuron
 	float delta_nabla_b;
 	float *nabla_w;
 	float *delta_nabla_w;
+	float activation;
+	float z;
 };
 
 struct Layer

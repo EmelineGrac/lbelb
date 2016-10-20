@@ -8,6 +8,14 @@ float sigmoid(float z){
 	return 1.0 / (1.0 + exp(-z));
 }
 
+float sigmoid_prime(float z){
+	return sigmoid(z)*(1-sigmoid(z));
+}
+
+float cost_derivative(float output_activation, float y){
+	return (output_activation - y);
+}
+
 int highest(float* result, int size){
 // return the index of the output which has the highest score
 	int res = 0;
@@ -63,9 +71,33 @@ int evaluate(struct Network n, float **inputs,
 	return res;
 }
 
-void backprop(float* trainingInputs, float desiredOutput){
-/* TODO
+void backprop(struct Network* n, float* trainingInputs, float desiredOutput){
+/*
 Update delta_nabla_bw
+*/
+
+int i,j,k;
+for(j = 0; j < n->layers[0].nbNeurons; j++)
+	// input layer activations are training inputs
+	n->layers[0].neurons[j].activation = trainingInputs[j];
+
+struct Neuron nr;
+for (i = 1; i < n->nbLayers; i++){
+  for (j = 0; j < n->layers[i].nbNeurons; j++){
+	nr = n->layers[i].neurons[j];
+	nr.z = 0;
+	for(k = 0; k < nr.nbInputs; k++){
+		nr.z += n->layers[i-1].neurons[k].activation
+			 * nr.weights[k];}
+	nr.activation = sigmoid(nr.z);
+  }
+}
+// backward pass TODO
+/*for(j = 0; j < n->layers[n->nbLayers - 1].nbNeurons; j++)
+simplifier tout ca
+	n->layers[n->nbLayers - 1].neurons[j].bias =
+	cost_derivative(neurons[j].activation,y)
+	 * sigmoid_prime(neurons[j].z);
 */
 }
 
@@ -93,7 +125,7 @@ eta is the learning rate.
   }
 
 for(; k < k_end; k++){
-  backprop((*k).trainingInputs,(*k).desiredOutput);
+  backprop(n,(*k).trainingInputs,(*k).desiredOutput);
 
   for (i = 0; i < n->nbLayers; i++){
     for (j = 0; j < n->layers[i].nbNeurons; j++){
