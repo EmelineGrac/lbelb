@@ -82,6 +82,7 @@ for(j = 0; j < n->layers[0].nbNeurons; j++)
 	n->layers[0].neurons[j].activation = trainingInputs[j];
 
 struct Neuron nr;
+struct Layer l,ll;
 for (i = 1; i < n->nbLayers; i++){
   for (j = 0; j < n->layers[i].nbNeurons; j++){
 	nr = n->layers[i].neurons[j];
@@ -92,13 +93,18 @@ for (i = 1; i < n->nbLayers; i++){
 	nr.activation = sigmoid(nr.z);
   }
 }
-// backward pass TODO
-/*for(j = 0; j < n->layers[n->nbLayers - 1].nbNeurons; j++)
-simplifier tout ca
-	n->layers[n->nbLayers - 1].neurons[j].bias =
-	cost_derivative(neurons[j].activation,y)
-	 * sigmoid_prime(neurons[j].z);
-*/
+// backward pass
+l = n->layers[n->nbLayers - 1];
+ll= n->layers[n->nbLayers - 2];
+for(j = 0; j < l.nbNeurons; j++){
+  nr = l.neurons[j];
+  nr.delta_nabla_b = cost_derivative(nr.activation,desiredOutput)
+			 * sigmoid_prime(nr.z);
+  for(k = 0; k < nr.nbInputs; k++){
+	nr.delta_nabla_w[k] = ll.neurons[k].activation
+			 * nr.delta_nabla_b;
+  }
+}
 }
 
 void update_mini_batch(struct Network* n, struct TrainingData* k,
