@@ -65,16 +65,25 @@ int evaluate(struct Network n, float **inputs,
 
 /*void SGD(struct Network* n, struct TrainingData* td, int epochs,
 int mini_batch_size, float eta){
-
-
+//TODO
+	struct TrainingData* mini_batches =
+		malloc(;
+	for(int j = 0; j < epochs; j++){
+		// random.shuffle(td);
+		for(int k = 0; k < size_td; k += mini_batch_size){
+			mini_batches.append(training_data[k:k+mini_batch_size])
+		}
+	}
+}
 }*/
-
 
 void initNeuron(struct Neuron* _neuron, float _bias, int _nbInputs)
 {
 	_neuron->bias = _bias;
 	_neuron->nbInputs = _nbInputs;
 	float *_weights = malloc(_nbInputs * sizeof(float));
+	float *_nabla_w = malloc(_nbInputs * sizeof(float));
+	float *_delta_nabla_w = malloc(_nbInputs * sizeof(float));
 	float rn;
 	float rn_max = 3.0;
 	for(int i = 0; i < _nbInputs; i++){
@@ -83,7 +92,12 @@ void initNeuron(struct Neuron* _neuron, float _bias, int _nbInputs)
 		_weights[i] = rn;
 	}
 	_neuron->weights = _weights;
+	_neuron->nabla_b = 0.0;
+	_neuron->delta_nabla_b = 0.0;
+	_neuron->nabla_w = _nabla_w;
+	_neuron->delta_nabla_w = _delta_nabla_w;
 }
+
 void initLayer(struct Layer* _layer, int _nbNeurons, int _nbInputs)
 {
 	_layer->nbNeurons = _nbNeurons;
@@ -103,8 +117,6 @@ void initLayer(struct Layer* _layer, int _nbNeurons, int _nbInputs)
 		initNeuron(&_neurons[i], rn, _nbInputs);
 		}
 	_layer->neurons = _neurons;
-
-
 }
 void initNetwork(struct Network* _network, int _nbLayers, int *_nbNeurons)
 {

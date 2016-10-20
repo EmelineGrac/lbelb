@@ -7,6 +7,10 @@ struct Neuron
 	float bias;
 	int nbInputs;
 	float *weights;
+	float nabla_b;
+	float delta_nabla_b;
+	float *nabla_w;
+	float *delta_nabla_w;
 };
 
 struct Layer
