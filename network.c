@@ -83,6 +83,8 @@ for(j = 0; j < n->layers[0].nbNeurons; j++)
 
 struct Neuron nr;
 struct Layer l,ll;
+float delta;
+float sp;
 for (i = 1; i < n->nbLayers; i++){
   for (j = 0; j < n->layers[i].nbNeurons; j++){
 	nr = n->layers[i].neurons[j];
@@ -98,11 +100,30 @@ l = n->layers[n->nbLayers - 1];
 ll= n->layers[n->nbLayers - 2];
 for(j = 0; j < l.nbNeurons; j++){
   nr = l.neurons[j];
-  nr.delta_nabla_b = cost_derivative(nr.activation,desiredOutput)
+  delta = cost_derivative(nr.activation,desiredOutput)
 			 * sigmoid_prime(nr.z);
+  nr.delta_nabla_b = delta;
   for(k = 0; k < nr.nbInputs; k++){
 	nr.delta_nabla_w[k] = ll.neurons[k].activation
 			 * nr.delta_nabla_b;
+  }
+}
+
+for(i = n->nbLayers - 2; i > 0; i--){
+ l = n->layers[i];
+ ll = n->layers[i-1];
+   for(j = 0; j < l.nbNeurons; j++){
+     nr = l.neurons[j];
+     sp = sigmoid_prime(nr.z);
+
+  // delta = np.dot(weights[-l+1].transpose(),delta) ???
+
+     delta *= sp;
+     nr.delta_nabla_b = delta;
+     for(k = 0; k < nr.nbInputs; k++){
+	nr.delta_nabla_w[k] = ll.neurons[k].activation
+			 * nr.delta_nabla_b;
+     }
   }
 }
 }
