@@ -1,7 +1,7 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <math.h>
-
+# include <time.h>
 # include "network.h"
 
 float sigmoid(float z){
@@ -12,7 +12,7 @@ float sigmoid_prime(float z){
 	return sigmoid(z)*(1-sigmoid(z));
 }
 
-float cost_derivative(float output_activation, float y){
+float cost_derivative(float output_activation, int y){
 	return (output_activation - y);
 }
 
@@ -71,12 +71,20 @@ int evaluate(struct Network n, float **inputs,
 	return res;
 }
 
-void backprop(struct Network* n, float* trainingInputs, float desiredOutput){
+void backprop(struct Network* n, float* trainingInputs, int desiredOutput){
 /*
 Update delta_nabla_bw
 */
 
 int i,j,k;
+for (i = 0; i < n->nbLayers; i++){
+    for (j = 0; j < n->layers[i].nbNeurons; j++){
+      n->layers[i].neurons[j].delta_nabla_b = 0;
+      for(k = 0; k < n->layers[i].neurons[j].nbInputs;k++){
+        n->layers[i].neurons[j].delta_nabla_w[k] = 0;
+      }
+    }
+  }
 for(j = 0; j < n->layers[0].nbNeurons; j++)
 	// input layer activations are training inputs
 	n->layers[0].neurons[j].activation = trainingInputs[j];
@@ -92,6 +100,7 @@ for (i = 1; i < n->nbLayers; i++){
 		nr->z += n->layers[i-1].neurons[k].activation
 			 * nr->weights[k];
 	}
+	nr->z += nr->bias;
 	nr->activation = sigmoid(nr->z);
   }
 }
@@ -118,7 +127,7 @@ for(i = n->nbLayers - 2; i > 0; i--){
      delta = 0;
      for(k = 0; k < n->layers[i+1].nbNeurons; k++){
 	delta += n->layers[i+1].neurons[k].weights[j]
-		 * n->layers[i+1].neurons[k].nabla_b;
+		 * n->layers[i+1].neurons[k].delta_nabla_b;
      }
      delta *= sp;
      nr->delta_nabla_b = delta;
@@ -210,10 +219,10 @@ void initNeuron(struct Neuron* _neuron, float _bias, int _nbInputs)
 	float *_nabla_w = malloc(_nbInputs * sizeof(float));
 	float *_delta_nabla_w = malloc(_nbInputs * sizeof(float));
 	float rn;
-	float rn_max = 1.0;
+	float rn_max = 1;
 	for(int i = 0; i < _nbInputs; i++){
 		// rn will be the same
-		rn = (float)rand()/(float)(RAND_MAX/rn_max);
+		rn = -0.5+(float)rand()/(float)(RAND_MAX/rn_max);
 		_weights[i] = rn;
 	}
 	_neuron->weights = _weights;
@@ -252,7 +261,6 @@ void initNetwork(struct Network* _network, int _nbLayers, int *_nbNeurons)
 /*	int *begin = _layers;
 	int *end = _layers + _nbLayers;
 	int *begin1 = _nbNeurons;
-	//int *end1 = _nbNeurons + _nbLayers;
 	for (; begin < end; begin++, begin1++)
 		{
 		initLayer(*begin, *begin1);
@@ -308,8 +316,8 @@ int main(int argc, char *argv[])
 		// 2 inputs
 		// 2 neurons in the hidden layer
 		// 1 output
-	printf("Initiating program\n");
-
+	printf("Random biases and weights:\n");
+	srand(time(NULL));
 	struct Network network;
 	int n0,n1,n2;
 	if (argc == 4){
@@ -320,7 +328,7 @@ int main(int argc, char *argv[])
 	else{
 		n0 = 2;
 		n1 = 2;
-		n2 = 2; //1;
+		n2 = 1; // TODO: 2 outputs;
 	}
 	int _nbNeurons[] = {n0,n1,n2};
 	initNetwork(&network, 3, _nbNeurons);
@@ -335,27 +343,14 @@ int main(int argc, char *argv[])
 	network.layers[1].neurons[1].weights[1] = -20;
 	network.layers[2].neurons[0].weights[0] = 20;
 	network.layers[2].neurons[0].weights[1] = 20;
-
-	printNetwork(network);
 */
+	printNetwork(network);
+
 	float _testInputs00[] = {0.0,0.0};
 	float _testInputs01[] = {0.00,1.0};
 	float _testInputs10[] = {1.00,0.00};
 	float _testInputs11[] = {1.00,1.00};
-	float _testInputs200[] = {0.1,0.1};
-	float _testInputs201[] = {0.10,0.9};
-	float _testInputs210[] = {0.95,0.15};
-	float _testInputs211[] = {0.89,0.82};
 
-/*	float *res = calloc(1, sizeof(float));
-	float *res2 = calloc(1, sizeof(float));
-	res = feedforward(network, 1, _testInputs10);
-	res2 = feedforward(network, 1, _testInputs00);
-	printf("%f XOR %f\n", _testInputs10[0], _testInputs10[1]);
-	printf("= %f\n", res[0]);
-	printf("%f XOR %f\n", _testInputs00[0], _testInputs00[1]);
-	printf("= %f\n", res2[0]);
-*/
 	/*size_t lenTest = 1;
 	float **testInputsList = malloc(lenTest * sizeof(float*));
 	int *testOutputs = malloc(lenTest * sizeof(int));
@@ -365,10 +360,9 @@ int main(int argc, char *argv[])
 		 evaluate(network, testInputs, testOutputs, lenTest));*/
 //	printf("Result (index output) = %d\n", test(network, _testInputs00));
 
-	printNetwork(network);
 	printf("Test SGD :\n");
 
-	size_t size_td = 8;
+	size_t size_td = 4;
 	struct TrainingData* td =
 	 malloc(size_td * sizeof(struct TrainingData));
 
@@ -388,49 +382,39 @@ int main(int argc, char *argv[])
 	td4.trainingInputs = _testInputs11;
 	td4.desiredOutput = 0;
 
-	struct TrainingData td5;
-	td5.trainingInputs = _testInputs200;
-	td5.desiredOutput = 0;
-
-	struct TrainingData td6;
-	td6.trainingInputs = _testInputs201;
-	td6.desiredOutput = 1;
-
-	struct TrainingData td7;
-	td7.trainingInputs = _testInputs210;
-	td7.desiredOutput = 1;
-
-	struct TrainingData td8;
-	td8.trainingInputs = _testInputs211;
-	td8.desiredOutput = 0;
-
 	td[0] = td1;
 	td[1] = td2;
 	td[2] = td3;
 	td[3] = td4;
-	td[4] = td5;
-	td[5] = td6;
-	td[6] = td7;
-	td[7] = td8;
 
-	int epochs = 10000;
+	int epochs = 1000000;
 	int mini_batch_size = 2;
-	float eta = 3.0;
+	float eta = 4.0;
 	printf(" Size of TrainingData = %zu\n %d epochs\n \
-mini_batch_size = %d\n eta = %f\n",
+mini_batch_size = %d\n eta = %f\n...",
 	size_td, epochs, mini_batch_size, eta);
 	SGD(&network, td, size_td, epochs, mini_batch_size, eta);
 
 	printNetwork(network);
 
-	float *res = calloc(2, sizeof(float));
-	float *res2 = calloc(2, sizeof(float));
-	res = feedforward(network, 1, _testInputs10);
-	res2 = feedforward(network, 1, _testInputs00);
-	printf("%f XOR %f\n", _testInputs10[0], _testInputs10[1]);
-	printf("= %f %f\n", res[0], res[1]);
+	float *res = calloc(1, sizeof(float));// TODO : 2
+	float *res2 = calloc(1, sizeof(float));
+	res = feedforward(network, 1, _testInputs00);
+	res2 = feedforward(network, 1, _testInputs01);
+	float *res3 = calloc(1, sizeof(float));
+	float *res4 = calloc(1, sizeof(float));
+	res3 = feedforward(network, 1, _testInputs10);
+	res4 = feedforward(network, 1, _testInputs11);
+
+	printf("feedforward...\n");
 	printf("%f XOR %f\n", _testInputs00[0], _testInputs00[1]);
-	printf("= %f %f\n", res2[0],res2[1]);
+	printf("= %f\n", res[0]);
+	printf("%f XOR %f\n", _testInputs01[0], _testInputs01[1]);
+	printf("= %f\n", res2[0]);
+	printf("%f XOR %f\n", _testInputs10[0], _testInputs10[1]);
+	printf("= %f\n", res3[0]);
+	printf("%f XOR %f\n", _testInputs11[0], _testInputs11[1]);
+	printf("= %f\n", res4[0]);
 
 	printf("End\n");
 	return 0;

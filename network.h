@@ -31,7 +31,7 @@ struct Network
 struct TrainingData
 {
 	float* trainingInputs;
-	float desiredOutput;
+	int desiredOutput;// TODO: int*
 };
 
 void printNetwork(struct Network);
