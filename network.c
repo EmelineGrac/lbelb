@@ -30,6 +30,7 @@ int highest(float* result, int size){
 }
 
 float* feedforward(struct Network n, int iLayer, float* inputsVect){
+// TODO: fix the memory leak
 // return the output of the network if inputsVect is input
 // input layer = 0
 	if (iLayer == n.nbLayers)
@@ -312,13 +313,17 @@ void printNetwork(struct Network n)
 
 void freeMemoryNetwork(struct Network* n)
 {
-	free(n->layers);
+	// free(n->layers); will cause invalid read
 	for (int j = 0; j < n->nbLayers; j++){
-		free(n->layers[j].neurons);
+		// free(n->layers[j].neurons);
 		for(int k = 0; k < n->layers[j].nbNeurons;k++){
 			free(n->layers[j].neurons[k].weights);
+			free(n->layers[j].neurons[k].nabla_w);
+			free(n->layers[j].neurons[k].delta_nabla_w);
 		}
+		free(n->layers[j].neurons);
         }
+	free(n->layers);
 }
 
 
@@ -415,12 +420,13 @@ mini_batch_size = %d\n eta = %f\n...",
 
 	printNetwork(network);
 
-	float *res = calloc(2, sizeof(float));
-	float *res2 = calloc(2, sizeof(float));
+	float *res;
+	float *res2;
+	float *res3;
+	float *res4; // = calloc(2, sizeof(float));
+	// memory already allocated in feedforward
 	res = feedforward(network, 1, _testInputs00);
 	res2 = feedforward(network, 1, _testInputs01);
-	float *res3 = calloc(2, sizeof(float));
-	float *res4 = calloc(2, sizeof(float));
 	res3 = feedforward(network, 1, _testInputs10);
 	res4 = feedforward(network, 1, _testInputs11);
 

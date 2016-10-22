@@ -1,5 +1,5 @@
 networkTest:	
-	gcc -Wall -Wextra -std=c99 network.c -o networkTest -lm
+	gcc -Wall -Wextra -std=c99 -g network.c -o networkTest -lm
 
 clean:
 	rm networkTest
