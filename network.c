@@ -415,12 +415,16 @@ mini_batch_size = %d\n eta = %f\n...",
 	printf("feedforward...\n");
 	printf("%f XOR %f\n", _testInputs00[0], _testInputs00[1]);
 	printf("= %f %f\n", res[0],res[1]);
+	printf("%d\n\n", highest(res,2));
 	printf("%f XOR %f\n", _testInputs01[0], _testInputs01[1]);
 	printf("= %f %f\n", res2[0],res2[1]);
+	printf("%d\n\n", highest(res2,2));
 	printf("%f XOR %f\n", _testInputs10[0], _testInputs10[1]);
 	printf("= %f %f\n", res3[0],res3[1]);
+	printf("%d\n\n", highest(res3,2));
 	printf("%f XOR %f\n", _testInputs11[0], _testInputs11[1]);
 	printf("= %f %f\n", res4[0],res4[1]);
+	printf("%d\n\n", highest(res4,2));
 
 	printf("End\n");
 	return 0;
