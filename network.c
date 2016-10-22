@@ -71,7 +71,7 @@ int evaluate(struct Network n, float **inputs,
 	return res;
 }
 
-void backprop(struct Network* n, float* trainingInputs, int desiredOutput){
+void backprop(struct Network* n, float* trainingInputs, int* desiredOutput){
 /*
 Update delta_nabla_bw
 */
@@ -109,7 +109,7 @@ l = n->layers[n->nbLayers - 1];
 ll= n->layers[n->nbLayers - 2];
 for(j = 0; j < l.nbNeurons; j++){
   nr = &(l.neurons[j]);
-  delta = cost_derivative(nr->activation,desiredOutput)
+  delta = cost_derivative(nr->activation,desiredOutput[j])
 			 * sigmoid_prime(nr->z);
   nr->delta_nabla_b = delta;
   for(k = 0; k < nr->nbInputs; k++){
@@ -328,7 +328,7 @@ int main(int argc, char *argv[])
 	else{
 		n0 = 2;
 		n1 = 2;
-		n2 = 1; // TODO: 2 outputs;
+		n2 = 2; // output 0 = False, 1 = True
 	}
 	int _nbNeurons[] = {n0,n1,n2};
 	initNetwork(&network, 3, _nbNeurons);
@@ -351,6 +351,12 @@ int main(int argc, char *argv[])
 	float _testInputs10[] = {1.00,0.00};
 	float _testInputs11[] = {1.00,1.00};
 
+	int r00[] = {1,0};
+	int r01[] = {0,1};
+	int r10[] = {0,1};
+	int r11[] = {1,0};
+
+
 	/*size_t lenTest = 1;
 	float **testInputsList = malloc(lenTest * sizeof(float*));
 	int *testOutputs = malloc(lenTest * sizeof(int));
@@ -368,19 +374,19 @@ int main(int argc, char *argv[])
 
 	struct TrainingData td1;
 	td1.trainingInputs = _testInputs00;
-	td1.desiredOutput = 0;
+	td1.desiredOutput = r00;
 
 	struct TrainingData td2;
 	td2.trainingInputs = _testInputs01;
-	td2.desiredOutput = 1;
+	td2.desiredOutput = r01;
 
 	struct TrainingData td3;
 	td3.trainingInputs = _testInputs10;
-	td3.desiredOutput = 1;
+	td3.desiredOutput = r10;
 
 	struct TrainingData td4;
 	td4.trainingInputs = _testInputs11;
-	td4.desiredOutput = 0;
+	td4.desiredOutput = r11;
 
 	td[0] = td1;
 	td[1] = td2;
@@ -397,24 +403,24 @@ mini_batch_size = %d\n eta = %f\n...",
 
 	printNetwork(network);
 
-	float *res = calloc(1, sizeof(float));// TODO : 2
-	float *res2 = calloc(1, sizeof(float));
+	float *res = calloc(2, sizeof(float));
+	float *res2 = calloc(2, sizeof(float));
 	res = feedforward(network, 1, _testInputs00);
 	res2 = feedforward(network, 1, _testInputs01);
-	float *res3 = calloc(1, sizeof(float));
-	float *res4 = calloc(1, sizeof(float));
+	float *res3 = calloc(2, sizeof(float));
+	float *res4 = calloc(2, sizeof(float));
 	res3 = feedforward(network, 1, _testInputs10);
 	res4 = feedforward(network, 1, _testInputs11);
 
 	printf("feedforward...\n");
 	printf("%f XOR %f\n", _testInputs00[0], _testInputs00[1]);
-	printf("= %f\n", res[0]);
+	printf("= %f %f\n", res[0],res[1]);
 	printf("%f XOR %f\n", _testInputs01[0], _testInputs01[1]);
-	printf("= %f\n", res2[0]);
+	printf("= %f %f\n", res2[0],res2[1]);
 	printf("%f XOR %f\n", _testInputs10[0], _testInputs10[1]);
-	printf("= %f\n", res3[0]);
+	printf("= %f %f\n", res3[0],res3[1]);
 	printf("%f XOR %f\n", _testInputs11[0], _testInputs11[1]);
-	printf("= %f\n", res4[0]);
+	printf("= %f %f\n", res4[0],res4[1]);
 
 	printf("End\n");
 	return 0;
