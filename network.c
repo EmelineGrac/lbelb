@@ -88,7 +88,7 @@ for (i = 0; i < n->nbLayers; i++){
 for(j = 0; j < n->layers[0].nbNeurons; j++)
 	// input layer activations are training inputs
 	n->layers[0].neurons[j].activation = trainingInputs[j];
-struct Neuron *nr; // must use a pointer!!!!!!
+struct Neuron *nr; // must use a pointer!
 struct Layer l,ll;
 float delta;
 float sp;
@@ -310,6 +310,18 @@ void printNetwork(struct Network n)
 	}
 }
 
+void freeMemoryNetwork(struct Network* n)
+{
+	free(n->layers);
+	for (int j = 0; j < n->nbLayers; j++){
+		free(n->layers[j].neurons);
+		for(int k = 0; k < n->layers[j].nbNeurons;k++){
+			free(n->layers[j].neurons[k].weights);
+		}
+        }
+}
+
+
 int main(int argc, char *argv[])
 { // hard-coded neural network for XOR function
 	// 3 layers
@@ -393,7 +405,7 @@ int main(int argc, char *argv[])
 	td[2] = td3;
 	td[3] = td4;
 
-	int epochs = 1000000;
+	int epochs = 10000;
 	int mini_batch_size = 2;
 	float eta = 4.0;
 	printf(" Size of TrainingData = %zu\n %d epochs\n \
@@ -426,6 +438,12 @@ mini_batch_size = %d\n eta = %f\n...",
 	printf("= %f %f\n", res4[0],res4[1]);
 	printf("%d\n\n", highest(res4,2));
 
+	free(td);
+	free(res);
+	free(res2);
+	free(res3);
+	free(res4);
+	freeMemoryNetwork(&network);
 	printf("End\n");
 	return 0;
 }
