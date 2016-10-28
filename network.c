@@ -30,7 +30,6 @@ int highest(float* result, int size){
 }
 
 float* feedforward(struct Network n, int iLayer, float* inputsVect){
-// TODO: fix the memory leak
 // return the output of the network if inputsVect is input
 // input layer = 0
 	if (iLayer == n.nbLayers)
@@ -49,6 +48,11 @@ float* feedforward(struct Network n, int iLayer, float* inputsVect){
 			outputsVect[j] = sigmoid(res + nr.bias);
 			j++;
 		}
+		if (iLayer > 1)
+			free(inputsVect);
+		// The function is at first called with iLayer = 1.
+		// In the first call inputsVect is not allocated,
+		// so no need to free it.
 		return feedforward(n, iLayer + 1, outputsVect);
 	}
 }
