@@ -323,9 +323,9 @@ void printNetwork(struct Network n)
 	}
 }
 
-void open(struct Network *n)
+void open(struct Network *n, char fileName[])
 {
-	FILE* f = fopen("test", "r");
+	FILE* f = fopen(fileName, "r");
 	int i,j,k,ll;
 
 	int _nbLayers = 0;
@@ -358,9 +358,9 @@ void open(struct Network *n)
 	fclose(f);
 }
 
-void write(struct Network n)
+void write(struct Network n, char fileName[])
 {
-	FILE* f = fopen("test", "w");
+	FILE* f = fopen(fileName, "w");
 	int i,j,k,ll;
 
 	fprintf(f, "%d\n",n.nbLayers);
@@ -538,7 +538,7 @@ int main(int argc, char *argv[])
 
 //Part 5: Save in file
 	printf("Write file\n");
-	write(network);
+	write(network, "test");
 
 
 //Part 6: Close the network
