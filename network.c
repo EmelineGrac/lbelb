@@ -2,6 +2,7 @@
 # include <stdio.h>
 # include <math.h>
 # include <time.h>
+# include <string.h>
 # include "network.h"
 
 float sigmoid(float z){
@@ -13,7 +14,7 @@ float sigmoid_prime(float z){
 }
 
 float cost_derivative(float output_activation, int y){
-	return (output_activation - y);
+	return output_activation - y;
 }
 
 int highest(float* result, int size){
@@ -37,7 +38,8 @@ float* feedforward(struct Network n, int iLayer, float* inputsVect){
 	else{
 		int j = 0;
 		float res = 0;
-		float* outputsVect = calloc(n.layers[iLayer].nbNeurons,sizeof(float));
+		float* outputsVect = calloc(n.layers[iLayer].nbNeurons,
+						sizeof(float));
 		struct Neuron nr = n.layers[iLayer].neurons[0];
 		while (j < n.layers[iLayer].nbNeurons){
 			res = 0;
@@ -58,7 +60,8 @@ float* feedforward(struct Network n, int iLayer, float* inputsVect){
 }
 
 int test(struct Network n, float* inputsVect){
-	return highest(feedforward(n, 1, inputsVect),n.layers[n.nbLayers-1].nbNeurons);
+	return highest(feedforward(n, 1, inputsVect),
+			n.layers[n.nbLayers-1].nbNeurons);
 }
 
 int evaluate(struct Network n, float **inputs,
@@ -80,7 +83,9 @@ int evaluate(struct Network n, float **inputs,
 	return res;
 }
 
-void backprop(struct Network* n, float* trainingInputs, int* desiredOutput){
+void backprop(struct Network* n,
+		float* trainingInputs,
+		int* desiredOutput){
 /*
 Update delta_nabla_bw
 */
@@ -97,7 +102,7 @@ for (i = 0; i < n->nbLayers; i++){
 for(j = 0; j < n->layers[0].nbNeurons; j++)
 	// input layer activations are training inputs
 	n->layers[0].neurons[j].activation = trainingInputs[j];
-struct Neuron *nr; // must use a pointer!
+struct Neuron *nr; // must use a pointer
 struct Layer l,ll;
 float delta;
 float sp;
@@ -148,8 +153,10 @@ for(i = n->nbLayers - 2; i > 0; i--){
 }
 }
 
-void update_mini_batch(struct Network* n, struct TrainingData* k,
-struct TrainingData* k_end, float eta){
+void update_mini_batch(struct Network* n,
+		struct TrainingData* k,
+		struct TrainingData* k_end,
+		float eta){
 
 /*
 Update the network's weights and biases
@@ -226,8 +233,7 @@ void initNeuron(struct Neuron* _neuron, float _bias, int _nbInputs)
 	_neuron->nbInputs = _nbInputs;
 
 	float *_weights = malloc(_nbInputs * sizeof(float));
-	//???
-	//Address 0x_ is 0 bytes after a block of size 0 alloc'd
+	//?Address 0x_ is 0 bytes after a block of size 0 alloc'd
 
 	float *_nabla_w = malloc(_nbInputs * sizeof(float));
 	float *_delta_nabla_w = malloc(_nbInputs * sizeof(float));
@@ -277,7 +283,7 @@ void initNetwork(struct Network* _network, int _nbLayers, int *_nbNeurons)
 		{
 		initLayer(*begin, *begin1);
 		}*/
-		int _nbInputs = 0;// first layer weights?
+		int _nbInputs = 0;// first layer has no weights
 		for(int i = 0; i < _nbLayers; i++)
 		{
 		initLayer(&_layers[i], _nbNeurons[i],_nbInputs);
@@ -406,46 +412,69 @@ void freeMemoryNetwork(struct Network* n)
 	free(n->nbNeurons);//if nbNeurons is a dynamic array
 }
 
+void randomInit(struct Network *n){
 
-int main(int argc, char *argv[])
+	int n1, n2, n3;
+
+	printf("\nNumber of neurons on layer 1: ");
+	scanf("%d", &n1);
+
+	printf("\nNumber of neurons on layer 2: ");
+	scanf("%d", &n2);
+
+	printf("\nNumber of neurons on layer 3: ");
+	scanf("%d", &n3);
+
+	int *_nbNeurons = malloc(3 * sizeof(int));
+	*_nbNeurons = n1;
+	*(_nbNeurons + 1) = n2;
+	*(_nbNeurons + 2) = n3;
+	printf("\nRandom biases and weights:\n");
+	initNetwork(n, 3, _nbNeurons);
+}
+
+int main()
 {
-// TODO: good interface
-
-// Part 1: load neural network
+// Loading neural network
 	srand(time(NULL));
 	struct Network network;
 
-// 1a: load from a file
-//	open(&network);
+	char mode[50];
+	char fileName[50];
 
-// 1b: random initialization
-	int n0,n1,n2;
-	if (argc == 4){
-		n0 = strtoul(argv[1], NULL, 10);
-		n1 = strtoul(argv[2], NULL, 10);
-		n2 = strtoul(argv[3], NULL, 10);
+	printf("Mode: loadFile, new\n");
+	scanf("%s", mode);
+
+	if (strcmp(mode,"loadFile") == 0){
+		printf("fileName: ");
+		scanf("%s", fileName);
+		open(&network, fileName);
 	}
-	else{
-		n0 = 2;
-		n1 = 2;
-		n2 = 2; // output 0 = False, 1 = True
-	}
-	// int _nbNeurons[] = {n0,n1,n2};
-	int *_nbNeurons = malloc(3 * sizeof(int));
-	*_nbNeurons = n0;
-	*(_nbNeurons + 1) = n1;
-	*(_nbNeurons + 2) = n2;
-	printf("\nRandom biases and weights:\n");
-	initNetwork(&network, 3, _nbNeurons);
-
-
-// if network != NULL (sucessfully loaded)
+	else
+		randomInit(&network);
 	printNetwork(network);
 
 
-// Part 2: train
+// Training
 
-// init trainingData
+	printf("\nUse SGD for training (XOR)\n");
+
+	size_t size_td = 4;
+	int epochs = 10000;
+	int mini_batch_size = 2;
+	float eta = 4.0;
+
+	printf("\nepochs: ");
+	scanf("%d", &epochs);
+	printf("\nmini_batch_size: ");
+	scanf("%d", &mini_batch_size);
+	printf("\neta: ");
+	scanf("%f", &eta);
+
+	printf("\n  Size of TrainingData = %zu\n  epochs = %d\n \
+ mini_batch_size = %d\n  eta = %f\n\n",
+	size_td, epochs, mini_batch_size, eta);
+
 	float _testInputs00[] = {0.0,0.0};
 	float _testInputs01[] = {0.00,1.0};
 	float _testInputs10[] = {1.00,0.00};
@@ -456,10 +485,6 @@ int main(int argc, char *argv[])
 	int r10[] = {0,1};
 	int r11[] = {1,0};
 
-
-	printf("\nTest SGD :\n");
-
-	size_t size_td = 4;
 	struct TrainingData* td =
 	 malloc(size_td * sizeof(struct TrainingData));
 
@@ -484,17 +509,12 @@ int main(int argc, char *argv[])
 	td[2] = td3;
 	td[3] = td4;
 
-	int epochs = 10000;
-	int mini_batch_size = 2;
-	float eta = 4.0;
-	printf("  Size of TrainingData = %zu\n  epochs = %d\n \
- mini_batch_size = %d\n  eta = %f\n\n",
-	size_td, epochs, mini_batch_size, eta);
 	SGD(&network, td, size_td, epochs, mini_batch_size, eta);
 
 	printNetwork(network);
 
-// Part 3: evaluation
+// Evaluation
+
 	int expectedOutputs[] = {0, 1, 1, 0};
 	float **evaluationInputs = malloc(8 * sizeof(float));
 	evaluationInputs[0] = _testInputs00;
@@ -502,15 +522,17 @@ int main(int argc, char *argv[])
 	evaluationInputs[2] = _testInputs10;
 	evaluationInputs[3] = _testInputs11;
 
-	int evalres = evaluate(network,evaluationInputs , expectedOutputs, 4);
+	int evalres = evaluate(network,evaluationInputs,
+				expectedOutputs,4);
 
 	printf("\nEvaluation : %d / 4 --> ", evalres);
-	if (evalres != 4) printf("FAIL\n"); else printf("SUCCESS\n");
-//	printf("Result (index output) = %d\n", test(network, _testInputs00));
+	if (evalres != 4)
+		printf("FAIL\n");
+	else
+		printf("SUCCESS\n");
 
+// Tests results
 
-
-// Part 4: test
 	float *res;
 	float *res2;
 	float *res3;
@@ -521,27 +543,30 @@ int main(int argc, char *argv[])
 	res3 = feedforward(network, 1, _testInputs10);
 	res4 = feedforward(network, 1, _testInputs11);
 
-	printf("\nAll tests...\n");
-	printf("%f XOR %f\n", _testInputs00[0], _testInputs00[1]);
+	printf("\nTests results:\n");
+	printf("%.0f XOR %.0f\n", _testInputs00[0], _testInputs00[1]);
 	printf("= %f %f\n", res[0],res[1]);
 	printf("%d\n\n", highest(res,2));
-	printf("%f XOR %f\n", _testInputs01[0], _testInputs01[1]);
+	printf("%.0f XOR %.0f\n", _testInputs01[0], _testInputs01[1]);
 	printf("= %f %f\n", res2[0],res2[1]);
 	printf("%d\n\n", highest(res2,2));
-	printf("%f XOR %f\n", _testInputs10[0], _testInputs10[1]);
+	printf("%.0f XOR %.0f\n", _testInputs10[0], _testInputs10[1]);
 	printf("= %f %f\n", res3[0],res3[1]);
 	printf("%d\n\n", highest(res3,2));
-	printf("%f XOR %f\n", _testInputs11[0], _testInputs11[1]);
+	printf("%.0f XOR %.0f\n", _testInputs11[0], _testInputs11[1]);
 	printf("= %f %f\n", res4[0],res4[1]);
 	printf("%d\n\n", highest(res4,2));
 
 
-//Part 5: Save in file
-	printf("Write file\n");
-	write(network, "test");
+//Save
+	if (evalres == 4){
+		printf("Write file? no/fileName\n");
+		scanf("%s", fileName);
+		if (strcmp("no", fileName) != 0)
+			write(network, fileName);
+	}
 
-
-//Part 6: Close the network
+//Free memory
 	free(td);
 	free(res);
 	free(res2);
@@ -553,20 +578,4 @@ int main(int argc, char *argv[])
 
 	printf("End\n");
 	return 0;
-/* hard-coded neural network for XOR function
-	// 3 layers
-		// 2 inputs
-		// 2 neurons in the hidden layer
-		// 1 output
-hard-coded bias and weights
-	network.layers[1].neurons[0].bias = -10;
-	network.layers[1].neurons[1].bias = 30;
-	network.layers[2].neurons[0].bias = -30;
-	network.layers[1].neurons[0].weights[0] = 20;
-	network.layers[1].neurons[0].weights[1] = 20;
-	network.layers[1].neurons[1].weights[0] = -20;
-	network.layers[1].neurons[1].weights[1] = -20;
-	network.layers[2].neurons[0].weights[0] = 20;
-	network.layers[2].neurons[0].weights[1] = 20;
-*/
 }
