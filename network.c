@@ -220,13 +220,13 @@ void initNeuron(struct Neuron* _neuron, float _bias, int _nbInputs)
 {
 	_neuron->bias = _bias;
 	_neuron->nbInputs = _nbInputs;
-	float *_weights = malloc(_nbInputs * sizeof(float));
+	float *_weights = malloc((_nbInputs  + 1)* sizeof(float));
+				//with +1 no memory error ?!
 	float *_nabla_w = malloc(_nbInputs * sizeof(float));
 	float *_delta_nabla_w = malloc(_nbInputs * sizeof(float));
 	float rn;
 	float rn_max = 1;
 	for(int i = 0; i < _nbInputs; i++){
-		// rn will be the same
 		rn = -0.5+(float)rand()/(float)(RAND_MAX/rn_max);
 		_weights[i] = rn;
 	}
@@ -315,6 +315,59 @@ void printNetwork(struct Network n)
 	}
 }
 
+void open(struct Network *n)
+{
+	FILE* f = fopen("test", "r");
+	int i,j,k;
+
+	int _nbLayers = 0;
+	fscanf(f, "%d\n", &_nbLayers);
+
+	int *_nbNeurons = calloc(sizeof(int), _nbLayers);
+	int *begin = _nbNeurons;
+	int *end = _nbNeurons + _nbLayers;
+	for(;begin < end - 1; ++begin){
+		fscanf(f, "%d ", begin);
+			printf("fscanf %p %d\n", begin, *begin);
+	}
+	fscanf(f, "%d\n", end - 1);
+	initNetwork(n, _nbLayers, _nbNeurons);
+
+	for (i = 0; i < n->nbLayers; i++){
+	  for (j = 0; j < n->layers[i].nbNeurons; j++){
+	   fscanf(f, "%f ", &(n->layers[i].neurons[j].bias));
+	     for(k = 0; k < n->layers[i].neurons[j].nbInputs-1;k++)
+	       fscanf(f, "%f ", &(n->layers[i].neurons[j].weights[k]));
+	     fscanf(f, "%f\n",&(n->layers[i].neurons[j].weights[k]));
+          }
+	}
+	fclose(f);
+}
+
+void write(struct Network n)
+{
+	FILE* f = fopen("test", "w");
+	int i,j,k;
+
+	fprintf(f, "%d\n",n.nbLayers);
+	int *begin = n.nbNeurons;
+	int *end = n.nbNeurons + n.nbLayers;
+	for(;begin < end - 1; ++begin)
+		fprintf(f, "%d ", *begin);
+	fprintf(f, "%d\n", *(end - 1));
+
+	for (i = 0; i < n.nbLayers; i++){
+	  for (j = 0; j < n.layers[i].nbNeurons; j++){
+	   fprintf(f, "%f ", n.layers[i].neurons[j].bias);
+	     for(k = 0; k < n.layers[i].neurons[j].nbInputs-1;k++)
+	       fprintf(f, "%f ", n.layers[i].neurons[j].weights[k]);
+	     fprintf(f, "%f\n",n.layers[i].neurons[j].weights[k]);
+          }
+	}
+	fclose(f);
+}
+
+
 void freeMemoryNetwork(struct Network* n)
 {
 	// free(n->layers); will cause invalid read
@@ -328,6 +381,8 @@ void freeMemoryNetwork(struct Network* n)
 		free(n->layers[j].neurons);
         }
 	free(n->layers);
+	// TODO
+	free(n->nbNeurons);// if nbNeurons is a dynamic array only...
 }
 
 
@@ -340,6 +395,7 @@ int main(int argc, char *argv[])
 	printf("Random biases and weights:\n");
 	srand(time(NULL));
 	struct Network network;
+
 	int n0,n1,n2;
 	if (argc == 4){
 		n0 = strtoul(argv[1], NULL, 10);
@@ -351,7 +407,11 @@ int main(int argc, char *argv[])
 		n1 = 2;
 		n2 = 2; // output 0 = False, 1 = True
 	}
-	int _nbNeurons[] = {n0,n1,n2};
+	// int _nbNeurons[] = {n0,n1,n2};
+	int *_nbNeurons = malloc(3 * sizeof(int));
+	*_nbNeurons = n0;
+	*(_nbNeurons + 1) = n1;
+	*(_nbNeurons + 2) = n2;
 	initNetwork(&network, 3, _nbNeurons);
 
 // hard-coded bias and weights
@@ -423,6 +483,8 @@ mini_batch_size = %d\n eta = %f\n...",
 	SGD(&network, td, size_td, epochs, mini_batch_size, eta);
 
 	printNetwork(network);
+	printf("Write file\n");
+	//write(network);TODO
 
 	float *res;
 	float *res2;
@@ -454,6 +516,13 @@ mini_batch_size = %d\n eta = %f\n...",
 	free(res3);
 	free(res4);
 	freeMemoryNetwork(&network);
+
+	struct Network network2;
+	printf("Load file\n");
+	open(&network2);
+	printNetwork(network2);
+	freeMemoryNetwork(&network2);
+
 	printf("End\n");
 	return 0;
 }
