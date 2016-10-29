@@ -220,8 +220,11 @@ void initNeuron(struct Neuron* _neuron, float _bias, int _nbInputs)
 {
 	_neuron->bias = _bias;
 	_neuron->nbInputs = _nbInputs;
-	float *_weights = malloc((_nbInputs  + 1)* sizeof(float));
-				//with +1 no memory error ?!
+
+	float *_weights = malloc(_nbInputs * sizeof(float));
+	//???
+	//Address 0x_ is 0 bytes after a block of size 0 alloc'd
+
 	float *_nabla_w = malloc(_nbInputs * sizeof(float));
 	float *_delta_nabla_w = malloc(_nbInputs * sizeof(float));
 	float rn;
@@ -318,7 +321,7 @@ void printNetwork(struct Network n)
 void open(struct Network *n)
 {
 	FILE* f = fopen("test", "r");
-	int i,j,k;
+	int i,j,k,ll;
 
 	int _nbLayers = 0;
 	fscanf(f, "%d\n", &_nbLayers);
@@ -326,19 +329,25 @@ void open(struct Network *n)
 	int *_nbNeurons = calloc(sizeof(int), _nbLayers);
 	int *begin = _nbNeurons;
 	int *end = _nbNeurons + _nbLayers;
-	for(;begin < end - 1; ++begin){
+	for(;begin < end - 1; ++begin)
 		fscanf(f, "%d ", begin);
-			printf("fscanf %p %d\n", begin, *begin);
-	}
 	fscanf(f, "%d\n", end - 1);
 	initNetwork(n, _nbLayers, _nbNeurons);
 
 	for (i = 0; i < n->nbLayers; i++){
 	  for (j = 0; j < n->layers[i].nbNeurons; j++){
 	   fscanf(f, "%f ", &(n->layers[i].neurons[j].bias));
-	     for(k = 0; k < n->layers[i].neurons[j].nbInputs-1;k++)
+	   ll = (n->layers[i].neurons[j].nbInputs) - 1;
+//TODO BUG
+	     for(k = 0; k < ll;k++)
 	       fscanf(f, "%f ", &(n->layers[i].neurons[j].weights[k]));
 	     fscanf(f, "%f\n",&(n->layers[i].neurons[j].weights[k]));
+//The code above causes Invalid write of size 4 for the last weight
+
+/*No problem with the code below... ?!
+             for(k = 0; k < ll + 1; k++)
+	       fscanf(f, "%f ", &(n->layers[i].neurons[j].weights[k]));
+*/
           }
 	}
 	fclose(f);
@@ -347,7 +356,7 @@ void open(struct Network *n)
 void write(struct Network n)
 {
 	FILE* f = fopen("test", "w");
-	int i,j,k;
+	int i,j,k,ll;
 
 	fprintf(f, "%d\n",n.nbLayers);
 	int *begin = n.nbNeurons;
@@ -359,9 +368,17 @@ void write(struct Network n)
 	for (i = 0; i < n.nbLayers; i++){
 	  for (j = 0; j < n.layers[i].nbNeurons; j++){
 	   fprintf(f, "%f ", n.layers[i].neurons[j].bias);
-	     for(k = 0; k < n.layers[i].neurons[j].nbInputs-1;k++)
+	   ll = (n.layers[i].neurons[j].nbInputs) - 1;
+//TODO BUG
+	     for(k = 0; k < ll;k++)
 	       fprintf(f, "%f ", n.layers[i].neurons[j].weights[k]);
 	     fprintf(f, "%f\n",n.layers[i].neurons[j].weights[k]);
+//The code above causes Invalid read of size 4 for the last weight
+
+/*No problem with the code below... ?!
+	     for(k = 0; k < ll + 1; k++)
+	       fprintf(f, "%f ", n.layers[i].neurons[j].weights[k]);
+*/
           }
 	}
 	fclose(f);
@@ -381,21 +398,17 @@ void freeMemoryNetwork(struct Network* n)
 		free(n->layers[j].neurons);
         }
 	free(n->layers);
-	// TODO
-	free(n->nbNeurons);// if nbNeurons is a dynamic array only...
+	free(n->nbNeurons);//if nbNeurons is a dynamic array
 }
 
 
 int main(int argc, char *argv[])
-{ // hard-coded neural network for XOR function
-	// 3 layers
-		// 2 inputs
-		// 2 neurons in the hidden layer
-		// 1 output
+{
 	printf("Random biases and weights:\n");
 	srand(time(NULL));
 	struct Network network;
-
+//	open(&network);
+//
 	int n0,n1,n2;
 	if (argc == 4){
 		n0 = strtoul(argv[1], NULL, 10);
@@ -413,18 +426,7 @@ int main(int argc, char *argv[])
 	*(_nbNeurons + 1) = n1;
 	*(_nbNeurons + 2) = n2;
 	initNetwork(&network, 3, _nbNeurons);
-
-// hard-coded bias and weights
-/*	network.layers[1].neurons[0].bias = -10;
-	network.layers[1].neurons[1].bias = 30;
-	network.layers[2].neurons[0].bias = -30;
-	network.layers[1].neurons[0].weights[0] = 20;
-	network.layers[1].neurons[0].weights[1] = 20;
-	network.layers[1].neurons[1].weights[0] = -20;
-	network.layers[1].neurons[1].weights[1] = -20;
-	network.layers[2].neurons[0].weights[0] = 20;
-	network.layers[2].neurons[0].weights[1] = 20;
-*/
+//
 	printNetwork(network);
 
 	float _testInputs00[] = {0.0,0.0};
@@ -484,7 +486,7 @@ mini_batch_size = %d\n eta = %f\n...",
 
 	printNetwork(network);
 	printf("Write file\n");
-	//write(network);TODO
+	write(network);
 
 	float *res;
 	float *res2;
@@ -525,4 +527,20 @@ mini_batch_size = %d\n eta = %f\n...",
 
 	printf("End\n");
 	return 0;
+/* hard-coded neural network for XOR function
+	// 3 layers
+		// 2 inputs
+		// 2 neurons in the hidden layer
+		// 1 output
+hard-coded bias and weights
+	network.layers[1].neurons[0].bias = -10;
+	network.layers[1].neurons[1].bias = 30;
+	network.layers[2].neurons[0].bias = -30;
+	network.layers[1].neurons[0].weights[0] = 20;
+	network.layers[1].neurons[0].weights[1] = 20;
+	network.layers[1].neurons[1].weights[0] = -20;
+	network.layers[1].neurons[1].weights[1] = -20;
+	network.layers[2].neurons[0].weights[0] = 20;
+	network.layers[2].neurons[0].weights[1] = 20;
+*/
 }
