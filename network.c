@@ -68,10 +68,14 @@ int evaluate(struct Network n, float **inputs,
  * network's output is assumed to be the index of whichever
  * neuron in the final layer has the highest activation.*/
 	int res = 0;
+	float *activations;
 	for(size_t i = 0; i < len; i++){
-		if (highest(feedforward(n, 1, inputs[i]),
-		n.layers[n.nbLayers-1].nbNeurons) == outputs[i])
+		activations = feedforward(n, 1, inputs[i]);
+		if (highest(activations,
+			n.layers[n.nbLayers-1].nbNeurons)
+				 == outputs[i])
 			res++;
+		free(activations);
 	}
 	return res;
 }
@@ -291,15 +295,15 @@ void array_print(int *begin, int *end)
       printf("|`|\n");
       line = 0;
     }
-    line += printf("| %4d ", *begin);
+    line += printf("| %2d ", *begin);
   }
   printf("|\n");
 }
 
 void printNetwork(struct Network n)
 {
-	printf("%d layers\n",n.nbLayers);
-	printf("Number of neurons :\n");
+	printf("\nNeural network with %d layers\n",n.nbLayers);
+	printf("Number of neurons:  ");
 	int *begin = n.nbNeurons;
 	int *end = n.nbNeurons + n.nbLayers;
 	array_print(begin, end);
@@ -307,11 +311,12 @@ void printNetwork(struct Network n)
 		printf("Layer %d (", i);
 		printf("%d neurons):\n", n.layers[i].nbNeurons);
 	  for (int j = 0; j < n.layers[i].nbNeurons; j++){
-	   printf("Neuron %d: ", j);
+	   printf("     Neuron %d: ", j);
 	   printf("bias = %f\n", n.layers[i].neurons[j].bias);
 	   //printf("nabla_b = %f\n", n.layers[i].neurons[j].nabla_b);
 	     for(int k = 0; k < n.layers[i].neurons[j].nbInputs;k++){
-	       printf("weight = %f\n", n.layers[i].neurons[j].weights[k]);
+	       printf("               weight = %f\n",
+			 n.layers[i].neurons[j].weights[k]);
 	     //printf("nabla_w = %f\n", n.layers[i].neurons[j].nabla_w[k]);
 	     }
           }
@@ -404,11 +409,16 @@ void freeMemoryNetwork(struct Network* n)
 
 int main(int argc, char *argv[])
 {
-	printf("Random biases and weights:\n");
+// TODO: good interface
+
+// Part 1: load neural network
 	srand(time(NULL));
 	struct Network network;
+
+// 1a: load from a file
 //	open(&network);
-//
+
+// 1b: random initialization
 	int n0,n1,n2;
 	if (argc == 4){
 		n0 = strtoul(argv[1], NULL, 10);
@@ -425,10 +435,17 @@ int main(int argc, char *argv[])
 	*_nbNeurons = n0;
 	*(_nbNeurons + 1) = n1;
 	*(_nbNeurons + 2) = n2;
+	printf("\nRandom biases and weights:\n");
 	initNetwork(&network, 3, _nbNeurons);
-//
+
+
+// if network != NULL (sucessfully loaded)
 	printNetwork(network);
 
+
+// Part 2: train
+
+// init trainingData
 	float _testInputs00[] = {0.0,0.0};
 	float _testInputs01[] = {0.00,1.0};
 	float _testInputs10[] = {1.00,0.00};
@@ -440,16 +457,7 @@ int main(int argc, char *argv[])
 	int r11[] = {1,0};
 
 
-	/*size_t lenTest = 1;
-	float **testInputsList = malloc(lenTest * sizeof(float*));
-	int *testOutputs = malloc(lenTest * sizeof(int));
-	testInputsList[0] = _testInputs;
-	testOutputs[0] = 0;
-	printf("evaluate : %d\n",
-		 evaluate(network, testInputs, testOutputs, lenTest));*/
-//	printf("Result (index output) = %d\n", test(network, _testInputs00));
-
-	printf("Test SGD :\n");
+	printf("\nTest SGD :\n");
 
 	size_t size_td = 4;
 	struct TrainingData* td =
@@ -479,15 +487,30 @@ int main(int argc, char *argv[])
 	int epochs = 10000;
 	int mini_batch_size = 2;
 	float eta = 4.0;
-	printf(" Size of TrainingData = %zu\n %d epochs\n \
-mini_batch_size = %d\n eta = %f\n...",
+	printf("  Size of TrainingData = %zu\n  epochs = %d\n \
+ mini_batch_size = %d\n  eta = %f\n\n",
 	size_td, epochs, mini_batch_size, eta);
 	SGD(&network, td, size_td, epochs, mini_batch_size, eta);
 
 	printNetwork(network);
-	printf("Write file\n");
-	write(network);
 
+// Part 3: evaluation
+	int expectedOutputs[] = {0, 1, 1, 0};
+	float **evaluationInputs = malloc(8 * sizeof(float));
+	evaluationInputs[0] = _testInputs00;
+	evaluationInputs[1] = _testInputs01;
+	evaluationInputs[2] = _testInputs10;
+	evaluationInputs[3] = _testInputs11;
+
+	int evalres = evaluate(network,evaluationInputs , expectedOutputs, 4);
+
+	printf("\nEvaluation : %d / 4 --> ", evalres);
+	if (evalres != 4) printf("FAIL\n"); else printf("SUCCESS\n");
+//	printf("Result (index output) = %d\n", test(network, _testInputs00));
+
+
+
+// Part 4: test
 	float *res;
 	float *res2;
 	float *res3;
@@ -498,7 +521,7 @@ mini_batch_size = %d\n eta = %f\n...",
 	res3 = feedforward(network, 1, _testInputs10);
 	res4 = feedforward(network, 1, _testInputs11);
 
-	printf("feedforward...\n");
+	printf("\nAll tests...\n");
 	printf("%f XOR %f\n", _testInputs00[0], _testInputs00[1]);
 	printf("= %f %f\n", res[0],res[1]);
 	printf("%d\n\n", highest(res,2));
@@ -512,18 +535,21 @@ mini_batch_size = %d\n eta = %f\n...",
 	printf("= %f %f\n", res4[0],res4[1]);
 	printf("%d\n\n", highest(res4,2));
 
+
+//Part 5: Save in file
+	printf("Write file\n");
+	write(network);
+
+
+//Part 6: Close the network
 	free(td);
 	free(res);
 	free(res2);
 	free(res3);
 	free(res4);
-	freeMemoryNetwork(&network);
+	free(evaluationInputs);
 
-	struct Network network2;
-	printf("Load file\n");
-	open(&network2);
-	printNetwork(network2);
-	freeMemoryNetwork(&network2);
+	freeMemoryNetwork(&network);
 
 	printf("End\n");
 	return 0;
