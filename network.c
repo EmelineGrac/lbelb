@@ -457,23 +457,12 @@ int main()
 
 // Training
 
-	printf("\nUse SGD for training (XOR)\n");
+	int evalres = 0;
 
 	size_t size_td = 4;
 	int epochs = 10000;
 	int mini_batch_size = 2;
 	float eta = 4.0;
-
-	printf("\nepochs: ");
-	scanf("%d", &epochs);
-	printf("\nmini_batch_size: ");
-	scanf("%d", &mini_batch_size);
-	printf("\neta: ");
-	scanf("%f", &eta);
-
-	printf("\n  Size of TrainingData = %zu\n  epochs = %d\n \
- mini_batch_size = %d\n  eta = %f\n\n",
-	size_td, epochs, mini_batch_size, eta);
 
 	float _testInputs00[] = {0.0,0.0};
 	float _testInputs01[] = {0.00,1.0};
@@ -509,27 +498,46 @@ int main()
 	td[2] = td3;
 	td[3] = td4;
 
-	SGD(&network, td, size_td, epochs, mini_batch_size, eta);
+	int expectedOutputs[] = {0, 1, 1, 0};
+	float **evaluationInputs = malloc(8 * sizeof(float));
 
-	printNetwork(network);
+	while (evalres != 4){
+
+	printf("\nUse SGD for training (XOR)\n");
+	printf("\nepochs: ");
+	scanf("%d", &epochs);
+	printf("\nmini_batch_size: ");
+	scanf("%d", &mini_batch_size);
+	printf("\neta: ");
+	scanf("%f", &eta);
+
+	printf("\n  Size of TrainingData = %zu\n  epochs = %d\n \
+ mini_batch_size = %d\n  eta = %f\n\n",
+	size_td, epochs, mini_batch_size, eta);
+
+	SGD(&network, td, size_td, epochs, mini_batch_size, eta);
 
 // Evaluation
 
-	int expectedOutputs[] = {0, 1, 1, 0};
-	float **evaluationInputs = malloc(8 * sizeof(float));
 	evaluationInputs[0] = _testInputs00;
 	evaluationInputs[1] = _testInputs01;
 	evaluationInputs[2] = _testInputs10;
 	evaluationInputs[3] = _testInputs11;
 
-	int evalres = evaluate(network,evaluationInputs,
+	evalres = evaluate(network,evaluationInputs,
 				expectedOutputs,4);
 
+	printNetwork(network);
+
 	printf("\nEvaluation : %d / 4 --> ", evalres);
-	if (evalres != 4)
+	if (evalres != 4){
 		printf("FAIL\n");
+		freeMemoryNetwork(&network);
+		randomInit(&network);
+	}
 	else
 		printf("SUCCESS\n");
+	}
 
 // Tests results
 
