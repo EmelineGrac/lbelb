@@ -5,16 +5,29 @@
 # include <string.h>
 # include "network.h"
 
+#ifndef PI
+#define PI 3.14159265358979323846
+#endif
+
 float sigmoid(float z){
 	return 1.0 / (1.0 + exp(-z));
 }
 
 float sigmoid_prime(float z){
-	return sigmoid(z)*(1-sigmoid(z));
+	return sigmoid(z) * (1 - sigmoid(z));
 }
 
 float cost_derivative(float output_activation, int y){
 	return output_activation - y;
+}
+
+double random_normal(void){
+/* Generate a random number following a Gaussian distribution
+** with mean 0 and standard deviation 1.
+** The Box-Muller transform is used.
+*/
+	return sqrt(-2 * log((rand() + 1.0) / (RAND_MAX + 1.0)))
+	* cos(2 * PI * (rand() + 1.0) / (RAND_MAX + 1.0));
 }
 
 int highest(float* result, int size){
@@ -67,9 +80,10 @@ int test(struct Network n, float* inputsVect){
 int evaluate(struct Network n, float **inputs,
 		 int *outputs, size_t len){
 /* Return the number of test inputs for which the neural
- * network outputs the correct result. Note that the neural
- * network's output is assumed to be the index of whichever
- * neuron in the final layer has the highest activation.*/
+** network outputs the correct result. Note that the neural
+** network's output is assumed to be the index of whichever
+** neuron in the final layer has the highest activation.
+*/
 	int res = 0;
 	float *activations;
 	for(size_t i = 0; i < len; i++){
@@ -86,8 +100,7 @@ int evaluate(struct Network n, float **inputs,
 void backprop(struct Network* n,
 		float* trainingInputs,
 		int* desiredOutput){
-/*
-Update delta_nabla_bw
+/* Update delta_nabla_bw
 */
 
 int i,j,k;
@@ -238,9 +251,8 @@ void initNeuron(struct Neuron* _neuron, float _bias, int _nbInputs)
 	float *_nabla_w = malloc(_nbInputs * sizeof(float));
 	float *_delta_nabla_w = malloc(_nbInputs * sizeof(float));
 	float rn;
-	float rn_max = 1;
 	for(int i = 0; i < _nbInputs; i++){
-		rn = -0.5+(float)rand()/(float)(RAND_MAX/rn_max);
+		rn = random_normal() / sqrt(_nbInputs);
 		_weights[i] = rn;
 	}
 	_neuron->weights = _weights;
@@ -255,19 +267,11 @@ void initLayer(struct Layer* _layer, int _nbNeurons, int _nbInputs)
 	_layer->nbNeurons = _nbNeurons;
 	struct Neuron *_neurons = (struct Neuron*)
 (malloc(_nbNeurons * sizeof(struct Neuron)));
-	/*int *begin = _neurons;
-	int *end = _neurons + _nbNeurons;
-	for (; begin < end;begin++)
-		{
-		 initNeuron(*begin, 0, 0);
-		}*/
 	float rn = 0.0;
-	float rn_max = 1.0;
-	for(int i = 0; i < _nbNeurons; i++)
-		{
-		rn = (float)rand()/(float)(RAND_MAX/rn_max);
+	for(int i = 0; i < _nbNeurons; i++){
+		rn = random_normal();
 		initNeuron(&_neurons[i], rn, _nbInputs);
-		}
+	}
 	_layer->neurons = _neurons;
 }
 void initNetwork(struct Network* _network, int _nbLayers, int *_nbNeurons)
@@ -276,19 +280,11 @@ void initNetwork(struct Network* _network, int _nbLayers, int *_nbNeurons)
 	_network->nbNeurons = _nbNeurons;
 	struct Layer *_layers = (struct Layer*)
 (malloc(_nbLayers * sizeof(struct Layer)));
-/*	int *begin = _layers;
-	int *end = _layers + _nbLayers;
-	int *begin1 = _nbNeurons;
-	for (; begin < end; begin++, begin1++)
-		{
-		initLayer(*begin, *begin1);
-		}*/
-		int _nbInputs = 0;// first layer has no weights
-		for(int i = 0; i < _nbLayers; i++)
-		{
+	int _nbInputs = 0;// first layer has no weights
+	for(int i = 0; i < _nbLayers; i++){
 		initLayer(&_layers[i], _nbNeurons[i],_nbInputs);
 		_nbInputs = _layers[i].nbNeurons;
-		}
+	}
 	_network->layers = _layers;
 }
 
