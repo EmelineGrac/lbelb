@@ -507,8 +507,19 @@ int main()
 
 	int expectedOutputs[] = {0, 1, 1, 0};
 	float **evaluationInputs = malloc(8 * sizeof(float));
+	evaluationInputs[0] = _testInputs00;
+	evaluationInputs[1] = _testInputs01;
+	evaluationInputs[2] = _testInputs10;
+	evaluationInputs[3] = _testInputs11;
+	evalres = evaluate(network,evaluationInputs,
+				expectedOutputs,4);
+	printf("\nEvaluation : %d / 4 --> ", evalres);
+	if (evalres != 4)
+		printf("FAIL\n");
+	else
+		printf("SUCCESS\n");
 
-	while (evalres != 4){
+	do{
 
 	printf("\nUse SGD for training (XOR)\n");
 	printf("\nepochs: ");
@@ -526,10 +537,6 @@ int main()
 
 // Evaluation
 
-	evaluationInputs[0] = _testInputs00;
-	evaluationInputs[1] = _testInputs01;
-	evaluationInputs[2] = _testInputs10;
-	evaluationInputs[3] = _testInputs11;
 
 	evalres = evaluate(network,evaluationInputs,
 				expectedOutputs,4);
@@ -541,10 +548,11 @@ int main()
 		printf("FAIL\n");
 		freeMemoryNetwork(&network);
 		randomInit(&network);
+		printNetwork(network);
 	}
 	else
 		printf("SUCCESS\n");
-	}
+	} while (evalres != 4);
 
 // Tests results
 
