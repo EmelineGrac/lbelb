@@ -401,15 +401,15 @@ void open(struct Network *n, char fileName[])
 	   nr = &(n->layers[i].neurons[j]);
 	   fscanf(f, "%f ", &(nr->bias));
 	   ll = nr->nbInputs - 1;
-//TODO BUG
+//TODO FIX BUG
 	     for (k = 0; k < ll; k++)
 	       fscanf(f, "%f ", &(nr->weights[k]));
-	     fscanf(f, "%f\n", &(nr->weights[k]));
+	     fscanf(f, "%f\n", &(nr->weights[ll]));
 //The code above causes Invalid write of size 4 for the last weight
 
 /*No problem with the code below... ?!
              for(k = 0; k < ll + 1; k++)
-	       fscanf(f, "%f ", &(n->layers[i].neurons[j].weights[k]));
+	       fscanf(f, "%f ", &(nr->weights[k]));
 */
           }
 	}
@@ -436,15 +436,15 @@ void write(struct Network n, char fileName[])
 	   nr = n.layers[i].neurons[j];
 	   fprintf(f, "%f ", nr.bias);
 	   ll = nr.nbInputs - 1;
-//TODO BUG
+//TODO FIX BUG
 	     for (k = 0; k < ll; k++)
 	       fprintf(f, "%f ", nr.weights[k]);
-	     fprintf(f, "%f\n", nr.weights[k]);
+	     fprintf(f, "%f\n", nr.weights[ll]);
 //The code above causes Invalid read of size 4 for the last weight
 
 /*No problem with the code below... ?!
 	     for(k = 0; k < ll + 1; k++)
-	       fprintf(f, "%f ", n.layers[i].neurons[j].weights[k]);
+	       fprintf(f, "%f ", nr.weights[k]);
 */
           }
 	}
@@ -452,7 +452,7 @@ void write(struct Network n, char fileName[])
 }
 
 
-void freeMemoryNetwork(struct Network* n)
+void freeMemoryNetwork(struct Network *n)
 {
 	// free(n->layers); will cause invalid read
 	for (int j = 0; j < n->nbLayers; j++)
