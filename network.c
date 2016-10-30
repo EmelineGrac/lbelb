@@ -97,7 +97,8 @@ int test(struct Network n, float *inputsVect)
 }
 
 
-/* Return the number of test inputs for which the neural
+/*
+** Return the number of test inputs for which the neural
 ** network outputs the correct result. Note that the neural
 ** network's output is assumed to be the index of whichever
 ** neuron in the final layer has the highest activation.
@@ -278,7 +279,6 @@ void SGD(struct Network *n,
   {
 	// random.shuffle(td);
 	k = td;
-	k_end = td + size_td;
 	for (; k < k_end; k += mini_batch_size)
 		update_mini_batch(n, k, k + mini_batch_size, eta);
   }
