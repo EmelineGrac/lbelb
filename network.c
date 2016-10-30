@@ -433,6 +433,13 @@ void randomInit(struct Network *n){
 	initNetwork(n, 3, _nbNeurons);
 }
 
+int* indexOutputToVector(int index, size_t len){
+		int *res = calloc(len, sizeof(int));
+		res[index] = 1;
+		return res;
+	}
+
+
 int main()
 {
 // Loading neural network
