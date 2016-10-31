@@ -17,3 +17,9 @@ then type the name of the file and go to step 5.
 6. If the learning has failed, go to step 4.
 7. Type no if you do not want to save the weights;
 OR type a file name.
+
+Segmentation:
+
+1. Compile with make.
+2. Run ./main image1.jpg
+
