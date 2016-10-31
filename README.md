@@ -6,6 +6,7 @@ Group:
 
 
 Neural network:
+
 1. Compile with make.
 2. Run ./networkTest.
 3. Type new to initiate a new network;
