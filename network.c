@@ -92,8 +92,12 @@ float* feedforward(struct Network n, int iLayer, float *inputsVect)
 
 int test(struct Network n, float *inputsVect)
 {
-	return highest(feedforward(n, 1, inputsVect),
-		       n.layers[n.nbLayers-1].nbNeurons);
+  int res;
+  float *activations;
+  activations = feedforward(n, 1, inputsVect);
+  res = highest(activations, n.layers[n.nbLayers-1].nbNeurons);
+  free(activations);
+  return res;
 }
 
 
@@ -376,7 +380,7 @@ void printNetwork(struct Network n)
 	}
 }
 
-void open(struct Network *n, char fileName[])
+void openWeightsFile(struct Network *n, char fileName[])
 {
 	FILE* f = fopen(fileName, "r");
 	int i, j, k, ll;
@@ -407,12 +411,15 @@ void open(struct Network *n, char fileName[])
 	          fscanf(f, "%f ", &(nr->weights[k]));
                fscanf(f, "%f\n", &(nr->weights[ll]));
             }
+            else
+               fscanf(f, "\n");
+
 	  }
 	}
 	fclose(f);
 }
 
-void write(struct Network n, char fileName[])
+void writeWeightsFile(struct Network n, char fileName[])
 {
 	FILE* f = fopen(fileName, "w");
 	int i, j, k, ll;
@@ -438,6 +445,8 @@ void write(struct Network n, char fileName[])
 	          fprintf(f, "%f ", nr.weights[k]);
               fprintf(f, "%f\n", nr.weights[ll]);
 	    }
+	    else
+              fprintf(f, "\n");
           }
 	}
 	fclose(f);
@@ -489,6 +498,59 @@ int* indexOutputToVector(int index, size_t len)
 	return res;
 }
 
+// BUILD TEXT FILE FUNCTIONS
+int isAcceptedByNeuralNetwork(float *input)
+{
+  // IF NOT A SINGLE CHARACTER (LIKE \N)
+  // RETURN 0
+  // ELSE
+  // RETURN 1
+  if (*input)
+    return 1;
+  return 1;
+}
+
+int specialTreatment(float *input)
+{
+  // CONVERT SPECIAL INPUT TO CHAR
+  if (*input)
+    return 1;
+  return '\n';
+}
+
+int outputInt2Char(int outputInt)
+{
+  // CONVERT TO ASCII CODE
+  int c_res = outputInt + 48;
+  return c_res;
+}
+
+
+void buildResultFile(struct Network n,
+		     float **inputs,
+		     size_t len,
+		     char *fileName)
+{
+  FILE* f = fopen(fileName, "w");
+  size_t i = 0;
+  int res = 0;
+  int c_res = 0;
+  for (; i < len; i++)
+  {
+     if (!isAcceptedByNeuralNetwork(inputs[i]))
+     {
+        c_res = specialTreatment(inputs[i]);
+     }
+     else
+     {
+        res = test(n, inputs[i]);
+        c_res = outputInt2Char(res);
+     }
+     fputc(c_res, f);
+  }
+  fclose(f);
+}
+
 
 int main()
 {
@@ -499,14 +561,14 @@ int main()
 	char mode[50];
 	char fileName[50];
 
-	printf("Mode: loadFile, new\n");
+	printf("Mode: loadWeightsFile, new\n");
 	scanf("%s", mode);
 
-	if (strcmp(mode,"loadFile") == 0)
+	if (strcmp(mode,"loadWeightsFile") == 0)
 	{
 		printf("fileName: ");
 		scanf("%s", fileName);
-		open(&network, fileName);
+		openWeightsFile(&network, fileName);
 	}
 	else
 		randomInit(&network);
@@ -632,14 +694,15 @@ int main()
 	printf("= %f %f\n", res4[0],res4[1]);
 	printf("%d\n\n", highest(res4,2));
 
-
+	printf("Print results in file 'results'\n");
+	buildResultFile(network, evaluationInputs, 4, "results");
 //Save
 	if (evalres == 4)
 	{
-		printf("Write file? no/fileName\n");
+		printf("Write weights file? no/fileName\n");
 		scanf("%s", fileName);
 		if (strcmp("no", fileName) != 0)
-			write(network, fileName);
+			writeWeightsFile(network, fileName);
 	}
 
 //Free memory

@@ -58,8 +58,15 @@ void initLayer(struct Layer *_layer, int _nbNeurons, int _nbInputs);
 void initNetwork(struct Network *_network, int _nbLayers, int *_nbNeurons);
 void array_print(int *begin, int *end);
 void printNetwork(struct Network n);
-void open(struct Network *n, char fileName[]);
-void write(struct Network n, char fileName[]);
+void openWeightsFile(struct Network *n, char fileName[]);
+void writeWeightsFile(struct Network n, char fileName[]);
 void freeMemoryNetwork(struct Network* n);
 void randomInit(struct Network *n);
 int* indexOutputToVector(int index, size_t len);
+int isAcceptedByNeuralNetwork(float *input);
+int specialTreatment(float *input);
+int outputInt2Char(int outputInt);
+void buildResultFile(struct Network n,
+		     float **inputs,
+		     size_t len,
+		     char *fileName);
