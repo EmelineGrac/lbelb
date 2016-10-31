@@ -398,20 +398,16 @@ void open(struct Network *n, char fileName[])
 	{
 	  for (j = 0; j < n->layers[i].nbNeurons; j++)
 	  {
-	   nr = &(n->layers[i].neurons[j]);
-	   fscanf(f, "%f ", &(nr->bias));
-	   ll = nr->nbInputs - 1;
-//TODO FIX BUG
-	     for (k = 0; k < ll; k++)
-	       fscanf(f, "%f ", &(nr->weights[k]));
-	     fscanf(f, "%f\n", &(nr->weights[ll]));
-//The code above causes Invalid write of size 4 for the last weight
-
-/*No problem with the code below... ?!
-             for(k = 0; k < ll + 1; k++)
-	       fscanf(f, "%f ", &(nr->weights[k]));
-*/
-          }
+	    nr = &(n->layers[i].neurons[j]);
+	    fscanf(f, "%f ", &(nr->bias));
+	    if (nr->nbInputs > 0)
+	    {
+	       ll = nr->nbInputs - 1;
+	       for (k = 0; k < ll; k++)
+	          fscanf(f, "%f ", &(nr->weights[k]));
+               fscanf(f, "%f\n", &(nr->weights[ll]));
+            }
+	  }
 	}
 	fclose(f);
 }
@@ -433,19 +429,15 @@ void write(struct Network n, char fileName[])
 	{
 	  for (j = 0; j < n.layers[i].nbNeurons; j++)
 	  {
-	   nr = n.layers[i].neurons[j];
-	   fprintf(f, "%f ", nr.bias);
-	   ll = nr.nbInputs - 1;
-//TODO FIX BUG
-	     for (k = 0; k < ll; k++)
-	       fprintf(f, "%f ", nr.weights[k]);
-	     fprintf(f, "%f\n", nr.weights[ll]);
-//The code above causes Invalid read of size 4 for the last weight
-
-/*No problem with the code below... ?!
-	     for(k = 0; k < ll + 1; k++)
-	       fprintf(f, "%f ", nr.weights[k]);
-*/
+	    nr = n.layers[i].neurons[j];
+	    fprintf(f, "%f ", nr.bias);
+	    if (nr.nbInputs > 0)
+	    {
+	      ll = nr.nbInputs - 1;
+	      for (k = 0; k < ll; k++)
+	          fprintf(f, "%f ", nr.weights[k]);
+              fprintf(f, "%f\n", nr.weights[ll]);
+	    }
           }
 	}
 	fclose(f);
