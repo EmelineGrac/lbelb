@@ -501,6 +501,7 @@ int* indexOutputToVector(int index, size_t len)
 // BUILD TEXT FILE FUNCTIONS
 int isAcceptedByNeuralNetwork(float *input)
 {
+  // USELESS CURRENTLY
   // IF NOT A SINGLE CHARACTER (LIKE \N)
   // RETURN 0
   // ELSE
@@ -512,6 +513,7 @@ int isAcceptedByNeuralNetwork(float *input)
 
 int specialTreatment(float *input)
 {
+  // USELESS CURRENTLY
   // CONVERT SPECIAL INPUT TO CHAR
   if (*input)
     return 1;
@@ -625,6 +627,13 @@ int main()
 	evaluationInputs[2] = _testInputs10;
 	evaluationInputs[3] = _testInputs11;
 
+	float *res;
+	float *res2;
+	float *res3;
+	float *res4; // = calloc(2, sizeof(float));
+	// memory already allocated in feedforward
+
+
 // First evaluation
 	evalres = evaluate(network,evaluationInputs,
 				expectedOutputs,4);
@@ -657,28 +666,38 @@ int main()
 	printNetwork(network);
 	printf("\nEvaluation : %d / 4 --> ", evalres);
 
+	res = feedforward(network, 1, _testInputs00);
+	res2 = feedforward(network, 1, _testInputs01);
+	res3 = feedforward(network, 1, _testInputs10);
+	res4 = feedforward(network, 1, _testInputs11);
+
+
 	if (evalres != 4)
 	{
-		printf("FAIL\n");
-		freeMemoryNetwork(&network);
-		randomInit(&network);
-		printNetwork(network);
+	printf("FAIL\n");
+	printf("\nTests results (FAILED):\n");
+	printf("%.0f XOR %.0f\n", _testInputs00[0], _testInputs00[1]);
+	printf("= %f %f\n", res[0],res[1]);
+	printf("%d\n\n", highest(res,2));
+	printf("%.0f XOR %.0f\n", _testInputs01[0], _testInputs01[1]);
+	printf("= %f %f\n", res2[0],res2[1]);
+	printf("%d\n\n", highest(res2,2));
+	printf("%.0f XOR %.0f\n", _testInputs10[0], _testInputs10[1]);
+	printf("= %f %f\n", res3[0],res3[1]);
+	printf("%d\n\n", highest(res3,2));
+	printf("%.0f XOR %.0f\n", _testInputs11[0], _testInputs11[1]);
+	printf("= %f %f\n", res4[0],res4[1]);
+	printf("%d\n\n", highest(res4,2));
+
+	freeMemoryNetwork(&network);
+	randomInit(&network);
+	printNetwork(network);
 	}
 	else
 		printf("SUCCESS\n");
 	} while (evalres != 4);
 
 // Tests results
-
-	float *res;
-	float *res2;
-	float *res3;
-	float *res4; // = calloc(2, sizeof(float));
-	// memory already allocated in feedforward
-	res = feedforward(network, 1, _testInputs00);
-	res2 = feedforward(network, 1, _testInputs01);
-	res3 = feedforward(network, 1, _testInputs10);
-	res4 = feedforward(network, 1, _testInputs11);
 
 	printf("\nTests results:\n");
 	printf("%.0f XOR %.0f\n", _testInputs00[0], _testInputs00[1]);
