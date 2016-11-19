@@ -19,6 +19,7 @@ struct Layer
 {
 	int nbNeurons;
 	struct Neuron* neurons;
+	float sum_outputs;
 };
 
 struct Network
@@ -37,6 +38,7 @@ struct TrainingData
 float sigmoid(float z);
 float sigmoid_prime(float z);
 float cost_derivative(float output_activation, int y);
+float softmax(struct Network *n, int j);
 double random_normal(void);
 int highest(float *result, int size);
 float* feedforward(struct Network *n, int iLayer, float *inputsVect);

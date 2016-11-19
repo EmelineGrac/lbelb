@@ -24,7 +24,11 @@ inline float cost_derivative(float output_activation, int y)
 	return output_activation - y;
 }
 
-
+inline float softmax(struct Network *n, int j)
+{
+	return exp(n->layers[n->nbLayers - 1].neurons[j].z)
+	/ n->layers[n->nbLayers - 1].sum_outputs;
+}
 /*
 ** Generate a random number following a Gaussian distribution
 ** with mean 0 and standard deviation 1.
@@ -68,18 +72,27 @@ float* feedforward(struct Network *n, int iLayer, float *inputsVect)
 	else
 	{
 		int j = 0;
-		float res = 0;
 		float* outputsVect = calloc(n->layers[iLayer].nbNeurons,
 					    sizeof (float));
-		struct Neuron nr = n->layers[iLayer].neurons[0];
-
+		struct Neuron *nr = &(n->layers[iLayer].neurons[0]);
+		n->layers[iLayer].sum_outputs = 0.0;
 		while (j < n->layers[iLayer].nbNeurons)
 		{
-			res = 0;
-			nr = n->layers[iLayer].neurons[j];
-			for (int k = 0; k < nr.nbInputs; k++)
-				res += inputsVect[k] * nr.weights[k];
-			outputsVect[j++] = sigmoid(res + nr.bias);
+			nr = &(n->layers[iLayer].neurons[j]);
+			nr->z = 0;
+			for (int k = 0; k < nr->nbInputs; k++)
+				nr->z += inputsVect[k] * nr->weights[k];
+			nr->z += nr->bias;
+			if (iLayer < n->nbLayers - 1)
+				outputsVect[j] = sigmoid(nr->z);
+			else
+				n->layers[iLayer].sum_outputs += exp(nr->z);
+			j++;
+		}
+		if (iLayer == n->nbLayers - 1)
+		{
+			for (j = 0; j < n->layers[iLayer].nbNeurons; j++)
+				outputsVect[j] = softmax(n, j);
 		}
 		if (iLayer > 1)
 			free(inputsVect);
@@ -141,8 +154,8 @@ void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
     }
   }
 
+// input layer activations are training inputs
  for (j = 0; j < n->layers[0].nbNeurons; j++)
-	// input layer activations are training inputs
    n->layers[0].neurons[j].activation = trainingInputs[j];
 
  struct Neuron *nr; // must use a pointer
@@ -150,21 +163,36 @@ void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
  float delta;
  float sp;
 
- for (i = 1; i < n->nbLayers; i++)
+ for (i = 1; i < n->nbLayers - 1; i++)
  {
    for (j = 0; j < n->layers[i].nbNeurons; j++)
    {
 	nr = &(n->layers[i].neurons[j]);
 	nr->z = 0;
 	for (k = 0; k < nr->nbInputs; k++)
-          nr->z += n->layers[i-1].neurons[k].activation * nr->weights[k];
+          nr->z += n->layers[i - 1].neurons[k].activation * nr->weights[k];
 	nr->z += nr->bias;
 	nr->activation = sigmoid(nr->z);
    }
  }
 
-// backward pass
+  n->layers[n->nbLayers - 1].sum_outputs = 0.0;
+  for (j = 0; j < n->layers[n->nbLayers - 1].nbNeurons; j++)
+  {
+    nr = &(n->layers[n->nbLayers - 1].neurons[j]);
+    nr->z = 0;
+    for (k = 0; k < nr->nbInputs; k++)
+      nr->z += n->layers[i - 1].neurons[k].activation * nr->weights[k];
+    nr->z += nr->bias;
+    n->layers[n->nbLayers - 1].sum_outputs += exp(nr->z);
+  }
+  for (j = 0; j < n->layers[n->nbLayers - 1].nbNeurons; j++)
+  {
+    nr = &(n->layers[n->nbLayers - 1].neurons[j]);
+    nr->activation = softmax(n, j);
+  }
 
+// backward pass
   l  = n->layers[n->nbLayers - 1];
   ll = n->layers[n->nbLayers - 2];
 
@@ -324,6 +352,7 @@ void initLayer(struct Layer *_layer, int _nbNeurons, int _nbInputs)
 
 	_layer->neurons = _neurons;
 	_layer->nbNeurons = _nbNeurons;
+	_layer->sum_outputs = 0.0;
 }
 
 void initNetwork(struct Network *_network, int _nbLayers, int *_nbNeurons)
