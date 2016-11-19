@@ -32,8 +32,8 @@ struct Network
 struct TrainingData
 {
 	float* trainingInputs;
-	int* desiredOutput;
 	int res;
+	int* desiredOutput;
 };
 
 float sigmoid(float z);

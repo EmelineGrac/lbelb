@@ -557,6 +557,13 @@ int* indexOutputToVector(int index, size_t len)
 	return res;
 }
 
+int outputVectorToIndex(int outputs[], int size)
+{
+	int i;
+	for (i = 0; i < size && outputs[i] != 1; i++);
+	return i;
+}
+
 // BUILD TEXT FILE FUNCTIONS
 int isAcceptedByNeuralNetwork(float *input)
 {
@@ -579,7 +586,7 @@ int specialTreatment(float *input)
   return '\n';
 }
 
-int outputInt2Char(int outputInt)
+int outputIntToChar(int outputInt)
 {
   // CONVERT TO ASCII CODE
   int c_res = outputInt + 48;
@@ -605,7 +612,7 @@ void buildResultFile(struct Network *n,
      else
      {
         res = test(n, inputs[i]);
-        c_res = outputInt2Char(res);
+        c_res = outputIntToChar(res);
      }
      fputc(c_res, f);
   }
@@ -650,46 +657,24 @@ int main()
 	float _testInputs10[] = {1.00,0.00};
 	float _testInputs11[] = {1.00,1.00};
 
-	int r00[] = {1,0};
-	int r01[] = {0,1};
-	int r10[] = {0,1};
-	int r11[] = {1,0};
-
 	struct TrainingData* td =
-	//could be a static array of size 4, use stack instead of heap
 	 malloc(size_td * sizeof(struct TrainingData));
 
-	struct TrainingData td1;
-	td1.trainingInputs = _testInputs00;
-	td1.desiredOutput = r00;
-	td1.res = 0;
+	td[0].trainingInputs = _testInputs00;
+	td[0].res = 0;
+	td[0].desiredOutput = indexOutputToVector(td[0].res, 2);
 
-	struct TrainingData td2;
-	td2.trainingInputs = _testInputs01;
-	td2.desiredOutput = r01;
-	td2.res = 1;
+	td[1].trainingInputs = _testInputs01;
+	td[1].res = 1;
+	td[1].desiredOutput = indexOutputToVector(td[1].res, 2);
 
-	struct TrainingData td3;
-	td3.trainingInputs = _testInputs10;
-	td3.desiredOutput = r10;
-	td3.res = 1;
+	td[2].trainingInputs = _testInputs10;
+	td[2].res = 1;
+	td[2].desiredOutput = indexOutputToVector(td[2].res, 2);
 
-	struct TrainingData td4;
-	td4.trainingInputs = _testInputs11;
-	td4.desiredOutput = r11;
-	td4.res = 0;
-
-	td[0] = td1;
-	td[1] = td2;
-	td[2] = td3;
-	td[3] = td4;
-
-	int expectedOutputs[] = {0, 1, 1, 0};
-	float **evaluationInputs = malloc(4 * sizeof(float *));
-	evaluationInputs[0] = _testInputs00;
-	evaluationInputs[1] = _testInputs01;
-	evaluationInputs[2] = _testInputs10;
-	evaluationInputs[3] = _testInputs11;
+	td[3].trainingInputs = _testInputs11;
+	td[3].res = 0;
+	td[3].desiredOutput = indexOutputToVector(td[3].res, 2);
 
 	float *res;
 	float *res2;
@@ -780,7 +765,14 @@ int main()
 	printf("%d\n\n", highest(res4,2));
 
 	printf("Print results in file 'results'\n");
+
+	float **evaluationInputs = malloc(4 * sizeof(float *));
+	evaluationInputs[0] = _testInputs00;
+	evaluationInputs[1] = _testInputs01;
+	evaluationInputs[2] = _testInputs10;
+	evaluationInputs[3] = _testInputs11;
 	buildResultFile(network, evaluationInputs, 4, "results");
+
 //Save
 	if (evalres == 4)
 	{
@@ -791,6 +783,10 @@ int main()
 	}
 
 //Free memory
+	free(td[0].desiredOutput);
+	free(td[1].desiredOutput);
+	free(td[2].desiredOutput);
+	free(td[3].desiredOutput);
 	free(td);
 	free(res);
 	free(res2);
