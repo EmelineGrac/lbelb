@@ -681,7 +681,7 @@ int main()
 	td[3] = td4;
 
 	int expectedOutputs[] = {0, 1, 1, 0};
-	float **evaluationInputs = malloc(8 * sizeof(float));
+	float **evaluationInputs = malloc(4 * sizeof(float *));
 	evaluationInputs[0] = _testInputs00;
 	evaluationInputs[1] = _testInputs01;
 	evaluationInputs[2] = _testInputs10;
