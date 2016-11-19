@@ -33,6 +33,7 @@ struct TrainingData
 {
 	float* trainingInputs;
 	int* desiredOutput;
+	int res;
 };
 
 float sigmoid(float z);
@@ -43,7 +44,7 @@ double random_normal(void);
 int highest(float *result, int size);
 float* feedforward(struct Network *n, int iLayer, float *inputsVect);
 int test(struct Network *n, float *inputsVect);
-int evaluate(struct Network *n, float **inputs, int *outputs, size_t len);
+int evaluate(struct Network *n, struct TrainingData td[], size_t size_td);
 void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput);
 void update_mini_batch(struct Network *n,
 		       struct TrainingData *k,

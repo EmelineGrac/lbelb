@@ -124,15 +124,15 @@ int test(struct Network *n, float *inputsVect)
 ** network's output is assumed to be the index of whichever
 ** neuron in the final layer has the highest activation.
 */
-int evaluate(struct Network *n, float **inputs, int *outputs, size_t len)
+int evaluate(struct Network *n, struct TrainingData td[], size_t size_td)
 {
  int res = 0;
  float *activations;
 
- for (size_t i = 0; i < len; i++)
+ for (size_t i = 0; i < size_td; i++)
  {
-   activations = feedforward(n, 1, inputs[i]);
-   if (highest(activations, n->layers[n->nbLayers-1].nbNeurons) == outputs[i])
+   activations = feedforward(n, 1, td[i].trainingInputs);
+   if (highest(activations, n->layers[n->nbLayers-1].nbNeurons) == td[i].res)
      res++;
    free(activations);
  }
@@ -268,7 +268,7 @@ void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
 */
 void update_mini_batch(struct Network *n,
                        struct TrainingData *k,
-                       struct TrainingData* k_end,
+                       struct TrainingData *k_end,
                        float eta)
 {
  int i, j, kk;
@@ -662,18 +662,22 @@ int main()
 	struct TrainingData td1;
 	td1.trainingInputs = _testInputs00;
 	td1.desiredOutput = r00;
+	td1.res = 0;
 
 	struct TrainingData td2;
 	td2.trainingInputs = _testInputs01;
 	td2.desiredOutput = r01;
+	td2.res = 1;
 
 	struct TrainingData td3;
 	td3.trainingInputs = _testInputs10;
 	td3.desiredOutput = r10;
+	td3.res = 1;
 
 	struct TrainingData td4;
 	td4.trainingInputs = _testInputs11;
 	td4.desiredOutput = r11;
+	td4.res = 0;
 
 	td[0] = td1;
 	td[1] = td2;
@@ -695,8 +699,7 @@ int main()
 
 
 // First evaluation
-	evalres = evaluate(network,evaluationInputs,
-				expectedOutputs,4);
+	evalres = evaluate(network, td, 4);
 	printf("\nEvaluation : %d / 4 --> ", evalres);
 
 	if (evalres != 4)
@@ -720,8 +723,7 @@ int main()
 // Training and evaluation (loop)
 
 	SGD(network, td, size_td, epochs, mini_batch_size, eta);
-	evalres = evaluate(network,evaluationInputs,
-				expectedOutputs,4);
+	evalres = evaluate(network, td, 4);
 
 	printNetwork(network);
 	printf("\nEvaluation : %d / 4 --> ", evalres);
