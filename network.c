@@ -1,25 +1,25 @@
-# include <stdlib.h>
-# include <stdio.h>
-# include <math.h>
-# include <time.h>
-# include <string.h>
-# include "network.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <time.h>
+#include <string.h>
+#include "network.h"
 
-# ifndef PI
-# define PI 3.14159265358979323846
-# endif
+#ifndef PI
+#define PI 3.14159265358979323846
+#endif
 
-float sigmoid(float z)
+inline float sigmoid(float z)
 {
 	return 1.0 / (1.0 + exp(-z));
 }
 
-float sigmoid_prime(float z)
+inline float sigmoid_prime(float z)
 {
 	return sigmoid(z) * (1 - sigmoid(z));
 }
 
-float cost_derivative(float output_activation, int y)
+inline float cost_derivative(float output_activation, int y)
 {
 	return output_activation - y;
 }
@@ -61,22 +61,22 @@ int highest(float *result, int size)
 ** return the output of the network if inputsVect is input
 ** input layer = 0
 */
-float* feedforward(struct Network n, int iLayer, float *inputsVect)
+float* feedforward(struct Network *n, int iLayer, float *inputsVect)
 {
-	if (iLayer == n.nbLayers)
+	if (iLayer == n->nbLayers)
 		return inputsVect;
 	else
 	{
 		int j = 0;
 		float res = 0;
-		float* outputsVect = calloc(n.layers[iLayer].nbNeurons,
+		float* outputsVect = calloc(n->layers[iLayer].nbNeurons,
 					    sizeof (float));
-		struct Neuron nr = n.layers[iLayer].neurons[0];
+		struct Neuron nr = n->layers[iLayer].neurons[0];
 
-		while (j < n.layers[iLayer].nbNeurons)
+		while (j < n->layers[iLayer].nbNeurons)
 		{
 			res = 0;
-			nr = n.layers[iLayer].neurons[j];
+			nr = n->layers[iLayer].neurons[j];
 			for (int k = 0; k < nr.nbInputs; k++)
 				res += inputsVect[k] * nr.weights[k];
 			outputsVect[j++] = sigmoid(res + nr.bias);
@@ -90,12 +90,12 @@ float* feedforward(struct Network n, int iLayer, float *inputsVect)
 	}
 }
 
-int test(struct Network n, float *inputsVect)
+int test(struct Network *n, float *inputsVect)
 {
   int res;
   float *activations;
   activations = feedforward(n, 1, inputsVect);
-  res = highest(activations, n.layers[n.nbLayers-1].nbNeurons);
+  res = highest(activations, n->layers[n->nbLayers-1].nbNeurons);
   free(activations);
   return res;
 }
@@ -107,7 +107,7 @@ int test(struct Network n, float *inputsVect)
 ** network's output is assumed to be the index of whichever
 ** neuron in the final layer has the highest activation.
 */
-int evaluate(struct Network n, float **inputs, int *outputs, size_t len)
+int evaluate(struct Network *n, float **inputs, int *outputs, size_t len)
 {
  int res = 0;
  float *activations;
@@ -115,7 +115,7 @@ int evaluate(struct Network n, float **inputs, int *outputs, size_t len)
  for (size_t i = 0; i < len; i++)
  {
    activations = feedforward(n, 1, inputs[i]);
-   if (highest(activations, n.layers[n.nbLayers-1].nbNeurons) == outputs[i])
+   if (highest(activations, n->layers[n->nbLayers-1].nbNeurons) == outputs[i])
      res++;
    free(activations);
  }
@@ -208,9 +208,9 @@ void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
 ** eta is the learning rate.
 */
 void update_mini_batch(struct Network *n,
-		       struct TrainingData *k,
-		       struct TrainingData* k_end,
-		       float eta)
+                       struct TrainingData *k,
+                       struct TrainingData* k_end,
+                       float eta)
 {
  int i, j, kk;
  size_t len = k_end - k;
@@ -270,11 +270,11 @@ void update_mini_batch(struct Network *n,
 ** eta is the learning rate.
 */
 void SGD(struct Network *n,
-	 struct TrainingData *td,
-	 size_t size_td,
-	 int epochs,
-	 int mini_batch_size,
-	 float eta)
+         struct TrainingData *td,
+         size_t size_td,
+         int epochs,
+         int mini_batch_size,
+         float eta)
 {
   struct TrainingData *k = td;
   struct TrainingData *k_end = td + size_td;
@@ -292,7 +292,6 @@ void SGD(struct Network *n,
 void initNeuron(struct Neuron *_neuron, float _bias, int _nbInputs)
 {
 	float *_weights = malloc(_nbInputs * sizeof (float));
-	// ? Address 0x_ is 0 bytes after a block of size 0 alloc'd
 	float *_nabla_w = malloc(_nbInputs * sizeof (float));
 	float *_delta_nabla_w = malloc(_nbInputs * sizeof (float));
 	float rn;
@@ -356,25 +355,25 @@ void array_print(int *begin, int *end)
   printf("|\n");
 }
 
-void printNetwork(struct Network n)
+void printNetwork(struct Network *n)
 {
-	printf("\nNeural network with %d layers\n", n.nbLayers);
+	printf("\nNeural network with %d layers\n", n->nbLayers);
 	printf("Number of neurons:  ");
-	int *begin = n.nbNeurons;
-	int *end = n.nbNeurons + n.nbLayers;
+	int *begin = n->nbNeurons;
+	int *end = n->nbNeurons + n->nbLayers;
 	array_print(begin, end);
-	for (int i = 0; i < n.nbLayers; i++)
+	for (int i = 0; i < n->nbLayers; i++)
         {
 		printf("Layer %d (", i);
-		printf("%d neurons):\n", n.layers[i].nbNeurons);
-	  for (int j = 0; j < n.layers[i].nbNeurons; j++)
+		printf("%d neurons):\n", n->layers[i].nbNeurons);
+	  for (int j = 0; j < n->layers[i].nbNeurons; j++)
           {
 	   printf("     Neuron %d: ", j);
-	   printf("bias = %f\n", n.layers[i].neurons[j].bias);
-	     for (int k = 0; k < n.layers[i].neurons[j].nbInputs; k++)
+	   printf("bias = %f\n", n->layers[i].neurons[j].bias);
+	     for (int k = 0; k < n->layers[i].neurons[j].nbInputs; k++)
              {
 	       printf("               weight = %f\n",
-			 n.layers[i].neurons[j].weights[k]);
+			 n->layers[i].neurons[j].weights[k]);
 	     }
           }
 	}
@@ -419,24 +418,24 @@ void openWeightsFile(struct Network *n, char fileName[])
 	fclose(f);
 }
 
-void writeWeightsFile(struct Network n, char fileName[])
+void writeWeightsFile(struct Network *n, char fileName[])
 {
 	FILE* f = fopen(fileName, "w");
 	int i, j, k, ll;
 	struct Neuron nr;
 
-	fprintf(f, "%d\n",n.nbLayers);
-	int *begin = n.nbNeurons;
-	int *end = n.nbNeurons + n.nbLayers;
+	fprintf(f, "%d\n",n->nbLayers);
+	int *begin = n->nbNeurons;
+	int *end = n->nbNeurons + n->nbLayers;
 	for (; begin < end - 1; ++begin)
 		fprintf(f, "%d ", *begin);
 	fprintf(f, "%d\n", *(end - 1));
 
-	for (i = 0; i < n.nbLayers; i++)
+	for (i = 0; i < n->nbLayers; i++)
 	{
-	  for (j = 0; j < n.layers[i].nbNeurons; j++)
+	  for (j = 0; j < n->layers[i].nbNeurons; j++)
 	  {
-	    nr = n.layers[i].neurons[j];
+	    nr = n->layers[i].neurons[j];
 	    fprintf(f, "%f ", nr.bias);
 	    if (nr.nbInputs > 0)
 	    {
@@ -528,10 +527,10 @@ int outputInt2Char(int outputInt)
 }
 
 
-void buildResultFile(struct Network n,
-		     float **inputs,
-		     size_t len,
-		     char *fileName)
+void buildResultFile(struct Network *n,
+                     float **inputs,
+                     size_t len,
+                     char *fileName)
 {
   FILE* f = fopen(fileName, "w");
   size_t i = 0;
@@ -558,7 +557,7 @@ int main()
 {
 // Loading neural network
 	srand(time(NULL));
-	struct Network network;
+	struct Network *network = malloc(sizeof (struct Network));
 
 	char mode[50];
 	char fileName[50];
@@ -570,10 +569,10 @@ int main()
 	{
 		printf("fileName: ");
 		scanf("%s", fileName);
-		openWeightsFile(&network, fileName);
+		openWeightsFile(network, fileName);
 	}
 	else
-		randomInit(&network);
+		randomInit(network);
 	printNetwork(network);
 
 
@@ -597,6 +596,7 @@ int main()
 	int r11[] = {1,0};
 
 	struct TrainingData* td =
+	//could be a static array of size 4, use stack instead of heap
 	 malloc(size_td * sizeof(struct TrainingData));
 
 	struct TrainingData td1;
@@ -659,7 +659,7 @@ int main()
 
 // Training and evaluation (loop)
 
-	SGD(&network, td, size_td, epochs, mini_batch_size, eta);
+	SGD(network, td, size_td, epochs, mini_batch_size, eta);
 	evalres = evaluate(network,evaluationInputs,
 				expectedOutputs,4);
 
@@ -689,9 +689,13 @@ int main()
 	printf("= %f %f\n", res4[0],res4[1]);
 	printf("%d\n\n", highest(res4,2));
 
-	freeMemoryNetwork(&network);
-	randomInit(&network);
+	freeMemoryNetwork(network);
+	randomInit(network);
 	printNetwork(network);
+	free(res); // will be reallocated when feedforward will be called
+	free(res2);
+	free(res3);
+	free(res4);
 	}
 	else
 		printf("SUCCESS\n");
@@ -732,8 +736,8 @@ int main()
 	free(res4);
 	free(evaluationInputs);
 
-	freeMemoryNetwork(&network);
-
+	freeMemoryNetwork(network);
+	free(network);
 	printf("End\n");
 	return 0;
 }

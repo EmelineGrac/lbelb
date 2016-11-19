@@ -39,9 +39,9 @@ float sigmoid_prime(float z);
 float cost_derivative(float output_activation, int y);
 double random_normal(void);
 int highest(float *result, int size);
-float* feedforward(struct Network n, int iLayer, float *inputsVect);
-int test(struct Network n, float *inputsVect);
-int evaluate(struct Network n, float **inputs, int *outputs, size_t len);
+float* feedforward(struct Network *n, int iLayer, float *inputsVect);
+int test(struct Network *n, float *inputsVect);
+int evaluate(struct Network *n, float **inputs, int *outputs, size_t len);
 void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput);
 void update_mini_batch(struct Network *n,
 		       struct TrainingData *k,
@@ -57,16 +57,16 @@ void initNeuron(struct Neuron *_neuron, float _bias, int _nbInputs);
 void initLayer(struct Layer *_layer, int _nbNeurons, int _nbInputs);
 void initNetwork(struct Network *_network, int _nbLayers, int *_nbNeurons);
 void array_print(int *begin, int *end);
-void printNetwork(struct Network n);
+void printNetwork(struct Network *n);
 void openWeightsFile(struct Network *n, char fileName[]);
-void writeWeightsFile(struct Network n, char fileName[]);
+void writeWeightsFile(struct Network *n, char fileName[]);
 void freeMemoryNetwork(struct Network* n);
 void randomInit(struct Network *n);
 int* indexOutputToVector(int index, size_t len);
 int isAcceptedByNeuralNetwork(float *input);
 int specialTreatment(float *input);
 int outputInt2Char(int outputInt);
-void buildResultFile(struct Network n,
+void buildResultFile(struct Network *n,
 		     float **inputs,
 		     size_t len,
 		     char *fileName);
