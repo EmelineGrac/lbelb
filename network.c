@@ -24,11 +24,15 @@ inline float cost_derivative(float output_activation, int y)
 	return output_activation - y;
 }
 
+/*
+** Softmax function for the last layer
+*/
 inline float softmax(struct Network *n, int j)
 {
-	return exp(n->layers[n->nbLayers - 1].neurons[j].z)
-	/ n->layers[n->nbLayers - 1].sum_outputs;
+	struct Layer *l = &(n->layers[n->nbLayers - 1]);
+	return exp(l->neurons[j].z) / l->sum_outputs;
 }
+
 /*
 ** Generate a random number following a Gaussian distribution
 ** with mean 0 and standard deviation 1.
@@ -137,12 +141,14 @@ int evaluate(struct Network *n, float **inputs, int *outputs, size_t len)
 
 
 /*
+** Backpropagation algorithm
 ** Update delta_nabla_bw
 */
 void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
 {
-
  int i, j, k;
+
+// 0.Initialization to ZERO
 
  for (i = 0; i < n->nbLayers; i++)
  {
@@ -154,11 +160,16 @@ void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
     }
   }
 
-// input layer activations are training inputs
+// 1. Set the corresponding activation for the input layer.
+// Input layer activations are training inputs
+
  for (j = 0; j < n->layers[0].nbNeurons; j++)
    n->layers[0].neurons[j].activation = trainingInputs[j];
 
- struct Neuron *nr; // must use a pointer
+// 2. Feedforward: For each l=2,3,…,L
+// compute zl=wlal−1+bl and al=sigmoid(zl).
+
+ struct Neuron *nr;
  struct Layer l, ll;
  float delta;
  float sp;
@@ -167,25 +178,34 @@ void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
  {
    for (j = 0; j < n->layers[i].nbNeurons; j++)
    {
-	nr = &(n->layers[i].neurons[j]);
-	nr->z = 0;
-	for (k = 0; k < nr->nbInputs; k++)
-          nr->z += n->layers[i - 1].neurons[k].activation * nr->weights[k];
-	nr->z += nr->bias;
-	nr->activation = sigmoid(nr->z);
+	 nr = &(n->layers[i].neurons[j]);
+	 nr->z = 0;
+
+	 for (k = 0; k < nr->nbInputs; k++)
+       nr->z += n->layers[i - 1].neurons[k].activation * nr->weights[k];
+	 nr->z += nr->bias;
+
+	 nr->activation = sigmoid(nr->z);
    }
  }
 
+  // last layer use the softmax function instead of the sigmoid one
   n->layers[n->nbLayers - 1].sum_outputs = 0.0;
+
+  // compute the denominator: sum over all the output neurons
   for (j = 0; j < n->layers[n->nbLayers - 1].nbNeurons; j++)
   {
     nr = &(n->layers[n->nbLayers - 1].neurons[j]);
     nr->z = 0;
+
     for (k = 0; k < nr->nbInputs; k++)
       nr->z += n->layers[i - 1].neurons[k].activation * nr->weights[k];
     nr->z += nr->bias;
+
     n->layers[n->nbLayers - 1].sum_outputs += exp(nr->z);
   }
+
+  // compute the activations
   for (j = 0; j < n->layers[n->nbLayers - 1].nbNeurons; j++)
   {
     nr = &(n->layers[n->nbLayers - 1].neurons[j]);
@@ -193,6 +213,9 @@ void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
   }
 
 // backward pass
+
+// 3. Output error: Compute the vector δL = ∇aC ⊙ σ′(zL).
+
   l  = n->layers[n->nbLayers - 1];
   ll = n->layers[n->nbLayers - 2];
 
@@ -200,29 +223,37 @@ void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
   {
     nr = &(l.neurons[j]);
     delta = cost_derivative(nr->activation, desiredOutput[j])
-		 * sigmoid_prime(nr->z);
+            * sigmoid_prime(nr->z);
     nr->delta_nabla_b = delta;
     for (k = 0; k < nr->nbInputs; k++)
       nr->delta_nabla_w[k] = ll.neurons[k].activation * nr->delta_nabla_b;
   }
 
+// 4. Backpropagate the error: For each l=L−1,L−2,…,2 compute
+// δl=((wl+1)δl+1) ⊙  σ′(zl).
+
  for(i = n->nbLayers - 2; i > 0; i--)
  {
    l  = n->layers[i];
-   ll = n->layers[i-1];
+   ll = n->layers[i - 1];
+
    for (j = 0; j < l.nbNeurons; j++)
    {
      nr = &(l.neurons[j]);
      sp = sigmoid_prime(nr->z);
      delta = 0;
-     for (k = 0; k < n->layers[i+1].nbNeurons; k++)
-	delta += n->layers[i+1].neurons[k].weights[j]
-		 * n->layers[i+1].neurons[k].delta_nabla_b;
+
+	 for (k = 0; k < n->layers[i + 1].nbNeurons; k++)
+	   delta +=   n->layers[i + 1].neurons[k].weights[j]
+		        * n->layers[i + 1].neurons[k].delta_nabla_b;
      delta *= sp;
+
+// 5. Output: Compute the gradient of the cost function.
+
      nr->delta_nabla_b = delta;
      for (k = 0; k < nr->nbInputs; k++)
-	nr->delta_nabla_w[k] = ll.neurons[k].activation
-		 * nr->delta_nabla_b;
+	   nr->delta_nabla_w[k] = ll.neurons[k].activation
+		                      * nr->delta_nabla_b;
   }
  }
 }
