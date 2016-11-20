@@ -11,17 +11,17 @@
 
 inline float sigmoid(float z)
 {
-	return 1.0 / (1.0 + exp(-z));
+    return 1.0 / (1.0 + exp(-z));
 }
 
 inline float sigmoid_prime(float z)
 {
-	return sigmoid(z) * (1 - sigmoid(z));
+    return sigmoid(z) * (1 - sigmoid(z));
 }
 
 inline float cost_derivative(float output_activation, int y)
 {
-	return output_activation - y;
+    return output_activation - y;
 }
 
 /*
@@ -29,8 +29,8 @@ inline float cost_derivative(float output_activation, int y)
 */
 inline float softmax(struct Network *n, int j)
 {
-	struct Layer *l = &(n->layers[n->nbLayers - 1]);
-	return exp(l->neurons[j].z) / l->sum_outputs;
+    struct Layer *l = &(n->layers[n->nbLayers - 1]);
+    return exp(l->neurons[j].z) / l->sum_outputs;
 }
 
 /*
@@ -40,8 +40,8 @@ inline float softmax(struct Network *n, int j)
 */
 double random_normal(void)
 {
-	return sqrt(-2 * log((rand() + 1.0) / (RAND_MAX + 1.0)))
-	* cos(2 * PI * (rand() + 1.0) / (RAND_MAX + 1.0));
+    return sqrt(-2 * log((rand() + 1.0) / (RAND_MAX + 1.0)))
+    * cos(2 * PI * (rand() + 1.0) / (RAND_MAX + 1.0));
 }
 
 
@@ -50,18 +50,18 @@ double random_normal(void)
 */
 int highest(float result[], int size)
 {
-	int res = 0;
-	float max = result[0];
+    int res = 0;
+    float max = result[0];
 
-	for (int i = 0; i < size; i++)
-	{
-		if (result[i] > max)
-		{
-			max = result[i];
-			res = i;
-		}
-	}
-	return res;
+    for (int i = 0; i < size; i++)
+    {
+        if (result[i] > max)
+        {
+            max = result[i];
+            res = i;
+        }
+    }
+    return res;
 }
 
 
@@ -71,42 +71,42 @@ int highest(float result[], int size)
 */
 float* feedforward(struct Network *n,
                    int             iLayer,
-				   float           inputsVect[])
+                   float           inputsVect[])
 {
-	if (iLayer == n->nbLayers)
-		return inputsVect;
-	else
-	{
-		int j = 0;
-		float* outputsVect = calloc(n->layers[iLayer].nbNeurons,
-					    sizeof (float));
-		struct Neuron *nr = &(n->layers[iLayer].neurons[0]);
-		n->layers[iLayer].sum_outputs = 0.0;
-		while (j < n->layers[iLayer].nbNeurons)
-		{
-			nr = &(n->layers[iLayer].neurons[j]);
-			nr->z = 0;
-			for (int k = 0; k < nr->nbInputs; k++)
-				nr->z += inputsVect[k] * nr->weights[k];
-			nr->z += nr->bias;
-			if (iLayer < n->nbLayers - 1)
-				outputsVect[j] = sigmoid(nr->z);
-			else
-				n->layers[iLayer].sum_outputs += exp(nr->z);
-			j++;
-		}
-		if (iLayer == n->nbLayers - 1)
-		{
-			for (j = 0; j < n->layers[iLayer].nbNeurons; j++)
-				outputsVect[j] = softmax(n, j);
-		}
-		if (iLayer > 1)
-			free(inputsVect);
-		// The function is at first called with iLayer = 1.
-		// In the first call inputsVect is not allocated,
-		// so no need to free it.
-		return feedforward(n, iLayer + 1, outputsVect);
-	}
+    if (iLayer == n->nbLayers)
+        return inputsVect;
+    else
+    {
+        int j = 0;
+        float* outputsVect = calloc(n->layers[iLayer].nbNeurons,
+                        sizeof (float));
+        struct Neuron *nr = &(n->layers[iLayer].neurons[0]);
+        n->layers[iLayer].sum_outputs = 0.0;
+        while (j < n->layers[iLayer].nbNeurons)
+        {
+            nr = &(n->layers[iLayer].neurons[j]);
+            nr->z = 0;
+            for (int k = 0; k < nr->nbInputs; k++)
+                nr->z += inputsVect[k] * nr->weights[k];
+            nr->z += nr->bias;
+            if (iLayer < n->nbLayers - 1)
+                outputsVect[j] = sigmoid(nr->z);
+            else
+                n->layers[iLayer].sum_outputs += exp(nr->z);
+            j++;
+        }
+        if (iLayer == n->nbLayers - 1)
+        {
+            for (j = 0; j < n->layers[iLayer].nbNeurons; j++)
+                outputsVect[j] = softmax(n, j);
+        }
+        if (iLayer > 1)
+            free(inputsVect);
+        // The function is at first called with iLayer = 1.
+        // In the first call inputsVect is not allocated,
+        // so no need to free it.
+        return feedforward(n, iLayer + 1, outputsVect);
+    }
 }
 
 int test(struct Network *n, float inputsVect[])
@@ -128,7 +128,7 @@ int test(struct Network *n, float inputsVect[])
 */
 int evaluate(struct Network      *n,
              struct TrainingData  td[],
-			 size_t               size_td)
+             size_t               size_td)
 {
  int res = 0;
  float *activations;
@@ -150,7 +150,7 @@ int evaluate(struct Network      *n,
 */
 void backprop(struct Network *n,
               float           trainingInputs[],
-			  int             desiredOutput[])
+              int             desiredOutput[])
 {
  int i, j, k;
 
@@ -184,14 +184,14 @@ void backprop(struct Network *n,
  {
    for (j = 0; j < n->layers[i].nbNeurons; j++)
    {
-	 nr = &(n->layers[i].neurons[j]);
-	 nr->z = 0;
+     nr = &(n->layers[i].neurons[j]);
+     nr->z = 0;
 
-	 for (k = 0; k < nr->nbInputs; k++)
+     for (k = 0; k < nr->nbInputs; k++)
        nr->z += n->layers[i - 1].neurons[k].activation * nr->weights[k];
-	 nr->z += nr->bias;
+     nr->z += nr->bias;
 
-	 nr->activation = sigmoid(nr->z);
+     nr->activation = sigmoid(nr->z);
    }
  }
 
@@ -249,17 +249,17 @@ void backprop(struct Network *n,
      sp = sigmoid_prime(nr->z);
      delta = 0;
 
-	 for (k = 0; k < n->layers[i + 1].nbNeurons; k++)
-	   delta +=   n->layers[i + 1].neurons[k].weights[j]
-		        * n->layers[i + 1].neurons[k].delta_nabla_b;
+     for (k = 0; k < n->layers[i + 1].nbNeurons; k++)
+       delta +=   n->layers[i + 1].neurons[k].weights[j]
+                * n->layers[i + 1].neurons[k].delta_nabla_b;
      delta *= sp;
 
 // 5. Output: Compute the gradient of the cost function.
 
      nr->delta_nabla_b = delta;
      for (k = 0; k < nr->nbInputs; k++)
-	   nr->delta_nabla_w[k] = ll.neurons[k].activation
-		                      * nr->delta_nabla_b;
+       nr->delta_nabla_w[k] = ll.neurons[k].activation
+                              * nr->delta_nabla_b;
   }
  }
 }
@@ -274,8 +274,8 @@ void backprop(struct Network *n,
 */
 void update_mini_batch(struct Network      *n,
                        struct TrainingData *k,
-					   struct TrainingData *k_end,
-					   float                eta)
+                       struct TrainingData *k_end,
+                       float                eta)
 {
  int i, j, kk;
  size_t len = k_end - k;
@@ -336,76 +336,76 @@ void update_mini_batch(struct Network      *n,
 */
 void SGD(struct Network      *n,
          struct TrainingData  td[],
-		 size_t               size_td,
-		 int                  epochs,
-		 int                  mini_batch_size,
-		 float                eta)
+         size_t               size_td,
+         int                  epochs,
+         int                  mini_batch_size,
+         float                eta)
 {
   struct TrainingData *k = td;
   struct TrainingData *k_end = td + size_td;
 
   for (int j = 0; j < epochs; j++)
   {
-	// random.shuffle(td);
-	k = td;
-	for (; k < k_end; k += mini_batch_size)
-		update_mini_batch(n, k, k + mini_batch_size, eta);
+    // random.shuffle(td);
+    k = td;
+    for (; k < k_end; k += mini_batch_size)
+        update_mini_batch(n, k, k + mini_batch_size, eta);
   }
 }
 
 
 void initNeuron(struct Neuron *_neuron, float _bias, int _nbInputs)
 {
-	float *_weights = malloc(_nbInputs * sizeof (float));
-	float *_nabla_w = malloc(_nbInputs * sizeof (float));
-	float *_delta_nabla_w = malloc(_nbInputs * sizeof (float));
-	float rn;
+    float *_weights = malloc(_nbInputs * sizeof (float));
+    float *_nabla_w = malloc(_nbInputs * sizeof (float));
+    float *_delta_nabla_w = malloc(_nbInputs * sizeof (float));
+    float rn;
 
-	for (int i = 0; i < _nbInputs; i++)
-	{
-		rn = random_normal() / sqrt(_nbInputs);
-		_weights[i] = rn;
-	}
+    for (int i = 0; i < _nbInputs; i++)
+    {
+        rn = random_normal() / sqrt(_nbInputs);
+        _weights[i] = rn;
+    }
 
-	_neuron->bias = _bias;
-	_neuron->nbInputs = _nbInputs;
-	_neuron->weights = _weights;
-	_neuron->nabla_b = 0.0;
-	_neuron->delta_nabla_b = 0.0;
-	_neuron->nabla_w = _nabla_w;
-	_neuron->delta_nabla_w = _delta_nabla_w;
+    _neuron->bias = _bias;
+    _neuron->nbInputs = _nbInputs;
+    _neuron->weights = _weights;
+    _neuron->nabla_b = 0.0;
+    _neuron->delta_nabla_b = 0.0;
+    _neuron->nabla_w = _nabla_w;
+    _neuron->delta_nabla_w = _delta_nabla_w;
 }
 
 void initLayer(struct Layer *_layer, int _nbNeurons, int _nbInputs)
 {
-	struct Neuron *_neurons = malloc(_nbNeurons * sizeof (struct Neuron));
-	float rn = 0.0;
+    struct Neuron *_neurons = malloc(_nbNeurons * sizeof (struct Neuron));
+    float rn = 0.0;
 
-	for (int i = 0; i < _nbNeurons; i++)
-	{
-		rn = random_normal();
-		initNeuron(&_neurons[i], rn, _nbInputs);
-	}
+    for (int i = 0; i < _nbNeurons; i++)
+    {
+        rn = random_normal();
+        initNeuron(&_neurons[i], rn, _nbInputs);
+    }
 
-	_layer->neurons = _neurons;
-	_layer->nbNeurons = _nbNeurons;
-	_layer->sum_outputs = 0.0;
+    _layer->neurons = _neurons;
+    _layer->nbNeurons = _nbNeurons;
+    _layer->sum_outputs = 0.0;
 }
 
 void initNetwork(struct Network *_network, int _nbLayers, int *_nbNeurons)
 {
-	struct Layer *_layers = malloc(_nbLayers * sizeof (struct Layer));
-	int _nbInputs = 0; // first layer has no weights
+    struct Layer *_layers = malloc(_nbLayers * sizeof (struct Layer));
+    int _nbInputs = 0; // first layer has no weights
 
-	for (int i = 0; i < _nbLayers; i++)
-	{
-		initLayer(&_layers[i], _nbNeurons[i],_nbInputs);
-		_nbInputs = _layers[i].nbNeurons;
-	}
+    for (int i = 0; i < _nbLayers; i++)
+    {
+        initLayer(&_layers[i], _nbNeurons[i],_nbInputs);
+        _nbInputs = _layers[i].nbNeurons;
+    }
 
-	_network->layers = _layers;
-	_network->nbLayers = _nbLayers;
-	_network->nbNeurons = _nbNeurons;
+    _network->layers = _layers;
+    _network->nbLayers = _nbLayers;
+    _network->nbNeurons = _nbNeurons;
 }
 
 void array_print(int *begin, int *end)
@@ -423,98 +423,98 @@ void array_print(int *begin, int *end)
 
 void printNetwork(struct Network *n)
 {
-	printf("\nNeural network with %d layers\n", n->nbLayers);
-	printf("Number of neurons:  ");
-	int *begin = n->nbNeurons;
-	int *end = n->nbNeurons + n->nbLayers;
-	array_print(begin, end);
-	for (int i = 0; i < n->nbLayers; i++)
+    printf("\nNeural network with %d layers\n", n->nbLayers);
+    printf("Number of neurons:  ");
+    int *begin = n->nbNeurons;
+    int *end = n->nbNeurons + n->nbLayers;
+    array_print(begin, end);
+    for (int i = 0; i < n->nbLayers; i++)
         {
-		printf("Layer %d (", i);
-		printf("%d neurons):\n", n->layers[i].nbNeurons);
-	  for (int j = 0; j < n->layers[i].nbNeurons; j++)
+        printf("Layer %d (", i);
+        printf("%d neurons):\n", n->layers[i].nbNeurons);
+      for (int j = 0; j < n->layers[i].nbNeurons; j++)
           {
-	   printf("     Neuron %d: ", j);
-	   printf("bias = %f\n", n->layers[i].neurons[j].bias);
-	     for (int k = 0; k < n->layers[i].neurons[j].nbInputs; k++)
+       printf("     Neuron %d: ", j);
+       printf("bias = %f\n", n->layers[i].neurons[j].bias);
+         for (int k = 0; k < n->layers[i].neurons[j].nbInputs; k++)
              {
-	       printf("               weight = %f\n",
-			 n->layers[i].neurons[j].weights[k]);
-	     }
+           printf("               weight = %f\n",
+             n->layers[i].neurons[j].weights[k]);
+         }
           }
-	}
+    }
 }
 
 void openWeightsFile(struct Network *n, char fileName[])
 {
-	FILE* f = fopen(fileName, "r");
-	int i, j, k, ll;
-	struct Neuron *nr;
+    FILE* f = fopen(fileName, "r");
+    int i, j, k, ll;
+    struct Neuron *nr;
 
-	int _nbLayers = 0;
-	fscanf(f, "%d\n", &_nbLayers);
+    int _nbLayers = 0;
+    fscanf(f, "%d\n", &_nbLayers);
 
-	int *_nbNeurons = calloc(sizeof (int), _nbLayers);
-	int *begin = _nbNeurons;
-	int *end = _nbNeurons + _nbLayers;
+    int *_nbNeurons = calloc(sizeof (int), _nbLayers);
+    int *begin = _nbNeurons;
+    int *end = _nbNeurons + _nbLayers;
 
-	for (; begin < end - 1; ++begin)
-		fscanf(f, "%d ", begin);
-	fscanf(f, "%d\n", end - 1);
-	initNetwork(n, _nbLayers, _nbNeurons);
+    for (; begin < end - 1; ++begin)
+        fscanf(f, "%d ", begin);
+    fscanf(f, "%d\n", end - 1);
+    initNetwork(n, _nbLayers, _nbNeurons);
 
-	for (i = 0; i < n->nbLayers; i++)
-	{
-	  for (j = 0; j < n->layers[i].nbNeurons; j++)
-	  {
-	    nr = &(n->layers[i].neurons[j]);
-	    fscanf(f, "%f ", &(nr->bias));
-	    if (nr->nbInputs > 0)
-	    {
-	       ll = nr->nbInputs - 1;
-	       for (k = 0; k < ll; k++)
-	          fscanf(f, "%f ", &(nr->weights[k]));
+    for (i = 0; i < n->nbLayers; i++)
+    {
+      for (j = 0; j < n->layers[i].nbNeurons; j++)
+      {
+        nr = &(n->layers[i].neurons[j]);
+        fscanf(f, "%f ", &(nr->bias));
+        if (nr->nbInputs > 0)
+        {
+           ll = nr->nbInputs - 1;
+           for (k = 0; k < ll; k++)
+              fscanf(f, "%f ", &(nr->weights[k]));
                fscanf(f, "%f\n", &(nr->weights[ll]));
             }
             else
                fscanf(f, "\n");
 
-	  }
-	}
-	fclose(f);
+      }
+    }
+    fclose(f);
 }
 
 void writeWeightsFile(struct Network *n, char fileName[])
 {
-	FILE* f = fopen(fileName, "w");
-	int i, j, k, ll;
-	struct Neuron nr;
+    FILE* f = fopen(fileName, "w");
+    int i, j, k, ll;
+    struct Neuron nr;
 
-	fprintf(f, "%d\n",n->nbLayers);
-	int *begin = n->nbNeurons;
-	int *end = n->nbNeurons + n->nbLayers;
-	for (; begin < end - 1; ++begin)
-		fprintf(f, "%d ", *begin);
-	fprintf(f, "%d\n", *(end - 1));
+    fprintf(f, "%d\n",n->nbLayers);
+    int *begin = n->nbNeurons;
+    int *end = n->nbNeurons + n->nbLayers;
+    for (; begin < end - 1; ++begin)
+        fprintf(f, "%d ", *begin);
+    fprintf(f, "%d\n", *(end - 1));
 
-	for (i = 0; i < n->nbLayers; i++)
-	{
-	  for (j = 0; j < n->layers[i].nbNeurons; j++)
-	  {
-	    nr = n->layers[i].neurons[j];
-	    fprintf(f, "%f ", nr.bias);
-	    if (nr.nbInputs > 0)
-	    {
-	      ll = nr.nbInputs - 1;
-	      for (k = 0; k < ll; k++)
-	          fprintf(f, "%f ", nr.weights[k]);
+    for (i = 0; i < n->nbLayers; i++)
+    {
+      for (j = 0; j < n->layers[i].nbNeurons; j++)
+      {
+        nr = n->layers[i].neurons[j];
+        fprintf(f, "%f ", nr.bias);
+        if (nr.nbInputs > 0)
+        {
+          ll = nr.nbInputs - 1;
+          for (k = 0; k < ll; k++)
+              fprintf(f, "%f ", nr.weights[k]);
               fprintf(f, "%f\n", nr.weights[ll]);
-	    }
-	    else
+        }
+        else
               fprintf(f, "\n");
           }
-	}
-	fclose(f);
+    }
+    fclose(f);
 }
 
 
@@ -523,24 +523,24 @@ void writeWeightsFile(struct Network *n, char fileName[])
 */
 void buildDataBase(FILE                *f,
                    struct TrainingData  td[],
-				   size_t               size_td,
-				   size_t               size_inputs,
-				   size_t               size_outputs)
+                   size_t               size_td,
+                   size_t               size_inputs,
+                   size_t               size_outputs)
 {
 // Write sizes
-	fwrite(&(size_td), sizeof (size_t), 1, f);
-	fwrite(&(size_inputs), sizeof (size_t), 1, f);
-	fwrite(&(size_outputs), sizeof (size_t), 1, f);
+    fwrite(&(size_td), sizeof (size_t), 1, f);
+    fwrite(&(size_inputs), sizeof (size_t), 1, f);
+    fwrite(&(size_outputs), sizeof (size_t), 1, f);
 
 // Write data
-	struct TrainingData *begin = td;
-	struct TrainingData *end = td + size_td;
-	for (; begin < end; ++begin)
-	{
-		fwrite(begin->trainingInputs,  sizeof (float), size_inputs, f);
-		fwrite(&(begin->res),  sizeof (int), 1, f);
-		fwrite(begin->desiredOutput, sizeof (int), size_outputs, f);
-	}
+    struct TrainingData *begin = td;
+    struct TrainingData *end = td + size_td;
+    for (; begin < end; ++begin)
+    {
+        fwrite(begin->trainingInputs,  sizeof (float), size_inputs, f);
+        fwrite(&(begin->res),  sizeof (int), 1, f);
+        fwrite(begin->desiredOutput, sizeof (int), size_outputs, f);
+    }
 }
 
 /*
@@ -548,91 +548,91 @@ void buildDataBase(FILE                *f,
 */
 void readDataBase(FILE                 *f,
                   struct TrainingData  *td[], // ref ptr
-				  size_t               *size_td,
-				  size_t               *size_inputs,
-				  size_t               *size_outputs)
+                  size_t               *size_td,
+                  size_t               *size_inputs,
+                  size_t               *size_outputs)
 {
 // Read sizes
-	fread((size_td), sizeof (size_t), 1, f);
-	fread((size_inputs), sizeof (size_t), 1, f);
-	fread((size_outputs), sizeof (size_t), 1, f);
+    fread((size_td), sizeof (size_t), 1, f);
+    fread((size_inputs), sizeof (size_t), 1, f);
+    fread((size_outputs), sizeof (size_t), 1, f);
 
 // Allocate
-	*td = malloc(sizeof (struct TrainingData) * (*size_td));
-	struct TrainingData *begin = *td;
-	struct TrainingData *end = *td + *size_td;
-	for (; begin < end; ++begin)
-	{
-		begin->trainingInputs = malloc(sizeof (float) * (*size_inputs));
-		fread(begin->trainingInputs,  sizeof (float), *size_inputs, f);
-		fread(&(begin->res),  sizeof (int), 1, f);
-		begin->desiredOutput = malloc(sizeof (int) * (*size_outputs));
-		fread(begin->desiredOutput, sizeof (int), *size_outputs, f);
-	}
+    *td = malloc(sizeof (struct TrainingData) * (*size_td));
+    struct TrainingData *begin = *td;
+    struct TrainingData *end = *td + *size_td;
+    for (; begin < end; ++begin)
+    {
+        begin->trainingInputs = malloc(sizeof (float) * (*size_inputs));
+        fread(begin->trainingInputs,  sizeof (float), *size_inputs, f);
+        fread(&(begin->res),  sizeof (int), 1, f);
+        begin->desiredOutput = malloc(sizeof (int) * (*size_outputs));
+        fread(begin->desiredOutput, sizeof (int), *size_outputs, f);
+    }
 }
 
 
 void freeMemoryNetwork(struct Network *n)
 {
-	// free(n->layers); will cause invalid read
-	for (int j = 0; j < n->nbLayers; j++)
-	{
-		for (int k = 0; k < n->layers[j].nbNeurons; k++)
-		{
-			free(n->layers[j].neurons[k].weights);
-			free(n->layers[j].neurons[k].nabla_w);
-			free(n->layers[j].neurons[k].delta_nabla_w);
-		}
-		free(n->layers[j].neurons);
+    // free(n->layers); will cause invalid read
+    for (int j = 0; j < n->nbLayers; j++)
+    {
+        for (int k = 0; k < n->layers[j].nbNeurons; k++)
+        {
+            free(n->layers[j].neurons[k].weights);
+            free(n->layers[j].neurons[k].nabla_w);
+            free(n->layers[j].neurons[k].delta_nabla_w);
         }
-	free(n->layers);
-	free(n->nbNeurons);
+        free(n->layers[j].neurons);
+        }
+    free(n->layers);
+    free(n->nbNeurons);
 }
 
 void freeMemoryTD(struct TrainingData *td[], size_t size_td)
 {
-	struct TrainingData *begin = *td;
-	struct TrainingData *end = *td + size_td;
-	for (; begin < end; ++begin)
-	{
-		free(begin->trainingInputs);
-		free(begin->desiredOutput);
-	}
+    struct TrainingData *begin = *td;
+    struct TrainingData *end = *td + size_td;
+    for (; begin < end; ++begin)
+    {
+        free(begin->trainingInputs);
+        free(begin->desiredOutput);
+    }
 }
 
 void randomInit(struct Network *n)
 {
-	int n1, n2, n3;
+    int n1, n2, n3;
 
-	printf("\nNumber of neurons on layer 1: ");
-	scanf("%d", &n1);
+    printf("\nNumber of neurons on layer 1: ");
+    scanf("%d", &n1);
 
-	printf("\nNumber of neurons on layer 2: ");
-	scanf("%d", &n2);
+    printf("\nNumber of neurons on layer 2: ");
+    scanf("%d", &n2);
 
-	printf("\nNumber of neurons on layer 3: ");
-	scanf("%d", &n3);
+    printf("\nNumber of neurons on layer 3: ");
+    scanf("%d", &n3);
 
-	int *_nbNeurons = malloc(3 * sizeof (int));
-	*_nbNeurons = n1;
-	*(_nbNeurons + 1) = n2;
-	*(_nbNeurons + 2) = n3;
-	printf("\nRandom biases and weights:\n");
-	initNetwork(n, 3, _nbNeurons);
+    int *_nbNeurons = malloc(3 * sizeof (int));
+    *_nbNeurons = n1;
+    *(_nbNeurons + 1) = n2;
+    *(_nbNeurons + 2) = n3;
+    printf("\nRandom biases and weights:\n");
+    initNetwork(n, 3, _nbNeurons);
 }
 
 int* indexOutputToVector(int index, size_t len)
 {
-	int *res = calloc(len, sizeof (int));
-	res[index] = 1;
-	return res;
+    int *res = calloc(len, sizeof (int));
+    res[index] = 1;
+    return res;
 }
 
 int outputVectorToIndex(int outputs[], int size)
 {
-	int i;
-	for (i = 0; i < size && outputs[i] != 1; i++);
-	return i;
+    int i;
+    for (i = 0; i < size && outputs[i] != 1; i++);
+    return i;
 }
 
 // BUILD TEXT FILE FUNCTIONS
@@ -667,8 +667,8 @@ int outputIntToChar(int outputInt)
 
 void buildResultFile(struct Network *n,
                      float          *inputs[],
-					 size_t          len,
-					 char            fileName[])
+                     size_t          len,
+                     char            fileName[])
 {
   FILE* f = fopen(fileName, "w");
   size_t i = 0;
@@ -693,200 +693,200 @@ void buildResultFile(struct Network *n,
 int main()
 {
 // Loading neural network, from a text file or randomly
-	srand(time(NULL)); // for random
-	struct Network *network = malloc(sizeof (struct Network));
+    srand(time(NULL)); // for random
+    struct Network *network = malloc(sizeof (struct Network));
 
-	char mode[50];
-	char fileName[50];
+    char mode[50];
+    char fileName[50];
 
-	printf("Mode: loadWeightsFile, new\n");
-	scanf("%s", mode);
+    printf("Mode: loadWeightsFile, new\n");
+    scanf("%s", mode);
 
-	if (strcmp(mode,"loadWeightsFile") == 0)
-	{
-		printf("fileName: ");
-		scanf("%s", fileName);
-		openWeightsFile(network, fileName);
-	}
-	else
-		randomInit(network);
-	printNetwork(network);
+    if (strcmp(mode,"loadWeightsFile") == 0)
+    {
+        printf("fileName: ");
+        scanf("%s", fileName);
+        openWeightsFile(network, fileName);
+    }
+    else
+        randomInit(network);
+    printNetwork(network);
 
 
 // Training
 
-	int evalres = 0;
-	size_t size_inputs = 2;
-	size_t size_outputs = 2;
+    int evalres = 0;
+    size_t size_inputs = 2;
+    size_t size_outputs = 2;
 
 // Learning parameters
-	size_t size_td = 4;
-	int epochs = 10000;
-	int mini_batch_size = 2;
-	float eta = 4.0;
+    size_t size_td = 4;
+    int epochs = 10000;
+    int mini_batch_size = 2;
+    float eta = 4.0;
 
 // inputs for training
-	float _testInputs00[] = {0.0,0.0};
-	float _testInputs01[] = {0.00,1.0};
-	float _testInputs10[] = {1.00,0.00};
-	float _testInputs11[] = {1.00,1.00};
+    float _testInputs00[] = {0.0,0.0};
+    float _testInputs01[] = {0.00,1.0};
+    float _testInputs10[] = {1.00,0.00};
+    float _testInputs11[] = {1.00,1.00};
 
 // build manually struct TrainingData, assign outputs
-	struct TrainingData *td = malloc(size_td * sizeof (struct TrainingData));
+    struct TrainingData *td = malloc(size_td * sizeof (struct TrainingData));
 
-	td[0].trainingInputs = _testInputs00;
-	td[0].res = 0;
-	td[0].desiredOutput = indexOutputToVector(td[0].res, 2);
+    td[0].trainingInputs = _testInputs00;
+    td[0].res = 0;
+    td[0].desiredOutput = indexOutputToVector(td[0].res, 2);
 
-	td[1].trainingInputs = _testInputs01;
-	td[1].res = 1;
-	td[1].desiredOutput = indexOutputToVector(td[1].res, 2);
+    td[1].trainingInputs = _testInputs01;
+    td[1].res = 1;
+    td[1].desiredOutput = indexOutputToVector(td[1].res, 2);
 
-	td[2].trainingInputs = _testInputs10;
-	td[2].res = 1;
-	td[2].desiredOutput = indexOutputToVector(td[2].res, 2);
+    td[2].trainingInputs = _testInputs10;
+    td[2].res = 1;
+    td[2].desiredOutput = indexOutputToVector(td[2].res, 2);
 
-	td[3].trainingInputs = _testInputs11;
-	td[3].res = 0;
-	td[3].desiredOutput = indexOutputToVector(td[3].res, 2);
+    td[3].trainingInputs = _testInputs11;
+    td[3].res = 0;
+    td[3].desiredOutput = indexOutputToVector(td[3].res, 2);
 
 // Save trainingData in a binary file
-	FILE *fileTD = fopen("trainingData", "wb");
-	buildDataBase(fileTD, td, size_td, size_inputs, size_outputs);
-	fclose(fileTD);
+    FILE *fileTD = fopen("trainingData", "wb");
+    buildDataBase(fileTD, td, size_td, size_inputs, size_outputs);
+    fclose(fileTD);
 
 // Free memory, only desiredOutput has been malloc
-	free(td[0].desiredOutput);
-	free(td[1].desiredOutput);
-	free(td[2].desiredOutput);
-	free(td[3].desiredOutput);
-	free(td);
+    free(td[0].desiredOutput);
+    free(td[1].desiredOutput);
+    free(td[2].desiredOutput);
+    free(td[3].desiredOutput);
+    free(td);
 
 // Load trainingData from the binary file
-	fileTD = fopen("trainingData", "rb");
-	td = NULL;
-	readDataBase(fileTD, &td, &size_td, &size_inputs, &size_outputs);
-	fclose(fileTD);
+    fileTD = fopen("trainingData", "rb");
+    td = NULL;
+    readDataBase(fileTD, &td, &size_td, &size_inputs, &size_outputs);
+    fclose(fileTD);
 
-	float *res;
-	float *res2;
-	float *res3;
-	float *res4; // = calloc(2, sizeof(float));
-	// memory already allocated in feedforward
+    float *res;
+    float *res2;
+    float *res3;
+    float *res4; // = calloc(2, sizeof(float));
+    // memory already allocated in feedforward
 
 
 // First evaluation
-	evalres = evaluate(network, td, 4);
-	printf("\nEvaluation : %d / 4 --> ", evalres);
+    evalres = evaluate(network, td, 4);
+    printf("\nEvaluation : %d / 4 --> ", evalres);
 
-	if (evalres != 4)
-		printf("FAIL\n");
-	else
-		printf("SUCCESS\n");
+    if (evalres != 4)
+        printf("FAIL\n");
+    else
+        printf("SUCCESS\n");
 
-	do {
-	printf("\nUse SGD for training (XOR)\n");
-	printf("\nepochs: ");
-	scanf("%d", &epochs);
-	printf("\nmini_batch_size: ");
-	scanf("%d", &mini_batch_size);
-	printf("\neta: ");
-	scanf("%f", &eta);
+    do {
+    printf("\nUse SGD for training (XOR)\n");
+    printf("\nepochs: ");
+    scanf("%d", &epochs);
+    printf("\nmini_batch_size: ");
+    scanf("%d", &mini_batch_size);
+    printf("\neta: ");
+    scanf("%f", &eta);
 
-	printf("\n  Size of TrainingData = %zu\n  epochs = %d\n \
+    printf("\n  Size of TrainingData = %zu\n  epochs = %d\n \
  mini_batch_size = %d\n  eta = %f\n\n",
-	size_td, epochs, mini_batch_size, eta);
+    size_td, epochs, mini_batch_size, eta);
 
 // Training and evaluation (loop)
 
 // use SGD for learning
-	SGD(network, td, size_td, epochs, mini_batch_size, eta);
+    SGD(network, td, size_td, epochs, mini_batch_size, eta);
 
-	printNetwork(network);
+    printNetwork(network);
 
 // Evaluation
-	evalres = evaluate(network, td, 4);
-	printf("\nEvaluation : %d / 4 --> ", evalres);
+    evalres = evaluate(network, td, 4);
+    printf("\nEvaluation : %d / 4 --> ", evalres);
 
-	res = feedforward(network, 1, _testInputs00);
-	res2 = feedforward(network, 1, _testInputs01);
-	res3 = feedforward(network, 1, _testInputs10);
-	res4 = feedforward(network, 1, _testInputs11);
+    res = feedforward(network, 1, _testInputs00);
+    res2 = feedforward(network, 1, _testInputs01);
+    res3 = feedforward(network, 1, _testInputs10);
+    res4 = feedforward(network, 1, _testInputs11);
 
-	if (evalres != 4) // FAIL
-	{
-	printf("FAIL\n");
-	printf("\nTests results (FAILED):\n");
-	printf("%.0f XOR %.0f\n", _testInputs00[0], _testInputs00[1]);
-	printf("= %f %f\n", res[0],res[1]);
-	printf("%d\n\n", highest(res,2));
-	printf("%.0f XOR %.0f\n", _testInputs01[0], _testInputs01[1]);
-	printf("= %f %f\n", res2[0],res2[1]);
-	printf("%d\n\n", highest(res2,2));
-	printf("%.0f XOR %.0f\n", _testInputs10[0], _testInputs10[1]);
-	printf("= %f %f\n", res3[0],res3[1]);
-	printf("%d\n\n", highest(res3,2));
-	printf("%.0f XOR %.0f\n", _testInputs11[0], _testInputs11[1]);
-	printf("= %f %f\n", res4[0],res4[1]);
-	printf("%d\n\n", highest(res4,2));
+    if (evalres != 4) // FAIL
+    {
+    printf("FAIL\n");
+    printf("\nTests results (FAILED):\n");
+    printf("%.0f XOR %.0f\n", _testInputs00[0], _testInputs00[1]);
+    printf("= %f %f\n", res[0],res[1]);
+    printf("%d\n\n", highest(res,2));
+    printf("%.0f XOR %.0f\n", _testInputs01[0], _testInputs01[1]);
+    printf("= %f %f\n", res2[0],res2[1]);
+    printf("%d\n\n", highest(res2,2));
+    printf("%.0f XOR %.0f\n", _testInputs10[0], _testInputs10[1]);
+    printf("= %f %f\n", res3[0],res3[1]);
+    printf("%d\n\n", highest(res3,2));
+    printf("%.0f XOR %.0f\n", _testInputs11[0], _testInputs11[1]);
+    printf("= %f %f\n", res4[0],res4[1]);
+    printf("%d\n\n", highest(res4,2));
 
-	freeMemoryNetwork(network);
-	randomInit(network);
-	printNetwork(network);
-	free(res); // will be reallocated when feedforward will be called
-	free(res2);
-	free(res3);
-	free(res4);
-	}
-	else // SUCCESS
-		printf("SUCCESS\n");
-	} while (evalres != 4);
+    freeMemoryNetwork(network);
+    randomInit(network);
+    printNetwork(network);
+    free(res); // will be reallocated when feedforward will be called
+    free(res2);
+    free(res3);
+    free(res4);
+    }
+    else // SUCCESS
+        printf("SUCCESS\n");
+    } while (evalres != 4);
 
 // Print tests results in the shell
 
-	printf("\nTests results:\n");
-	printf("%.0f XOR %.0f\n", _testInputs00[0], _testInputs00[1]);
-	printf("= %f %f\n", res[0],res[1]);
-	printf("%d\n\n", highest(res,2));
-	printf("%.0f XOR %.0f\n", _testInputs01[0], _testInputs01[1]);
-	printf("= %f %f\n", res2[0],res2[1]);
-	printf("%d\n\n", highest(res2,2));
-	printf("%.0f XOR %.0f\n", _testInputs10[0], _testInputs10[1]);
-	printf("= %f %f\n", res3[0],res3[1]);
-	printf("%d\n\n", highest(res3,2));
-	printf("%.0f XOR %.0f\n", _testInputs11[0], _testInputs11[1]);
-	printf("= %f %f\n", res4[0],res4[1]);
-	printf("%d\n\n", highest(res4,2));
+    printf("\nTests results:\n");
+    printf("%.0f XOR %.0f\n", _testInputs00[0], _testInputs00[1]);
+    printf("= %f %f\n", res[0],res[1]);
+    printf("%d\n\n", highest(res,2));
+    printf("%.0f XOR %.0f\n", _testInputs01[0], _testInputs01[1]);
+    printf("= %f %f\n", res2[0],res2[1]);
+    printf("%d\n\n", highest(res2,2));
+    printf("%.0f XOR %.0f\n", _testInputs10[0], _testInputs10[1]);
+    printf("= %f %f\n", res3[0],res3[1]);
+    printf("%d\n\n", highest(res3,2));
+    printf("%.0f XOR %.0f\n", _testInputs11[0], _testInputs11[1]);
+    printf("= %f %f\n", res4[0],res4[1]);
+    printf("%d\n\n", highest(res4,2));
 
 // Print results in a text file
-	printf("Print results in file 'results'\n");
+    printf("Print results in file 'results'\n");
 
-	float **evaluationInputs = malloc(4 * sizeof(float *));
-	evaluationInputs[0] = _testInputs00;
-	evaluationInputs[1] = _testInputs01;
-	evaluationInputs[2] = _testInputs10;
-	evaluationInputs[3] = _testInputs11;
-	buildResultFile(network, evaluationInputs, 4, "results");
+    float **evaluationInputs = malloc(4 * sizeof(float *));
+    evaluationInputs[0] = _testInputs00;
+    evaluationInputs[1] = _testInputs01;
+    evaluationInputs[2] = _testInputs10;
+    evaluationInputs[3] = _testInputs11;
+    buildResultFile(network, evaluationInputs, 4, "results");
 
 // Save weights in a text file
-	if (evalres == 4)
-	{
-		printf("Write weights file? no/fileName\n");
-		scanf("%s", fileName);
-		if (strcmp("no", fileName) != 0)
-			writeWeightsFile(network, fileName);
-	}
+    if (evalres == 4)
+    {
+        printf("Write weights file? no/fileName\n");
+        scanf("%s", fileName);
+        if (strcmp("no", fileName) != 0)
+            writeWeightsFile(network, fileName);
+    }
 
 // Free memory
-	freeMemoryTD(&td, size_td);
-	free(td);
-	free(res);
-	free(res2);
-	free(res3);
-	free(res4);
-	free(evaluationInputs);
-	freeMemoryNetwork(network);
-	free(network);
-	printf("End\n");
-	return 0;
+    freeMemoryTD(&td, size_td);
+    free(td);
+    free(res);
+    free(res2);
+    free(res3);
+    free(res4);
+    free(evaluationInputs);
+    freeMemoryNetwork(network);
+    free(network);
+    printf("End\n");
+    return 0;
 }
