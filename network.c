@@ -48,7 +48,7 @@ double random_normal(void)
 /*
 ** Return the index of the output which has the highest score
 */
-int highest(float *result, int size)
+int highest(float result[], int size)
 {
 	int res = 0;
 	float max = result[0];
@@ -69,7 +69,9 @@ int highest(float *result, int size)
 ** return the output of the network if inputsVect is input
 ** input layer = 0
 */
-float* feedforward(struct Network *n, int iLayer, float *inputsVect)
+float* feedforward(struct Network *n,
+                   int             iLayer,
+				   float           inputsVect[])
 {
 	if (iLayer == n->nbLayers)
 		return inputsVect;
@@ -107,7 +109,7 @@ float* feedforward(struct Network *n, int iLayer, float *inputsVect)
 	}
 }
 
-int test(struct Network *n, float *inputsVect)
+int test(struct Network *n, float inputsVect[])
 {
   int res;
   float *activations;
@@ -124,7 +126,9 @@ int test(struct Network *n, float *inputsVect)
 ** network's output is assumed to be the index of whichever
 ** neuron in the final layer has the highest activation.
 */
-int evaluate(struct Network *n, struct TrainingData td[], size_t size_td)
+int evaluate(struct Network      *n,
+             struct TrainingData  td[],
+			 size_t               size_td)
 {
  int res = 0;
  float *activations;
@@ -144,7 +148,9 @@ int evaluate(struct Network *n, struct TrainingData td[], size_t size_td)
 ** Backpropagation algorithm
 ** Update delta_nabla_bw
 */
-void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
+void backprop(struct Network *n,
+              float           trainingInputs[],
+			  int             desiredOutput[])
 {
  int i, j, k;
 
@@ -266,10 +272,10 @@ void backprop(struct Network *n, float *trainingInputs,	int* desiredOutput)
 ** The mini_batch is an array of struct TrainingData
 ** eta is the learning rate.
 */
-void update_mini_batch(struct Network *n,
+void update_mini_batch(struct Network      *n,
                        struct TrainingData *k,
-                       struct TrainingData *k_end,
-                       float eta)
+					   struct TrainingData *k_end,
+					   float                eta)
 {
  int i, j, kk;
  size_t len = k_end - k;
@@ -328,12 +334,12 @@ void update_mini_batch(struct Network *n,
 ** mini_batch_size is the size of one sample.
 ** eta is the learning rate.
 */
-void SGD(struct Network *n,
-         struct TrainingData *td,
-         size_t size_td,
-         int epochs,
-         int mini_batch_size,
-         float eta)
+void SGD(struct Network      *n,
+         struct TrainingData  td[],
+		 size_t               size_td,
+		 int                  epochs,
+		 int                  mini_batch_size,
+		 float                eta)
 {
   struct TrainingData *k = td;
   struct TrainingData *k_end = td + size_td;
@@ -512,6 +518,60 @@ void writeWeightsFile(struct Network *n, char fileName[])
 }
 
 
+/*
+** Build a binary file that stores trainingData.
+*/
+void buildDataBase(FILE                *f,
+                   struct TrainingData  td[],
+				   size_t               size_td,
+				   size_t               size_inputs,
+				   size_t               size_outputs)
+{
+// Write sizes
+	fwrite(&(size_td), sizeof (size_t), 1, f);
+	fwrite(&(size_inputs), sizeof (size_t), 1, f);
+	fwrite(&(size_outputs), sizeof (size_t), 1, f);
+
+// Write data
+	struct TrainingData *begin = td;
+	struct TrainingData *end = td + size_td;
+	for (; begin < end; ++begin)
+	{
+		fwrite(begin->trainingInputs,  sizeof (float), size_inputs, f);
+		fwrite(&(begin->res),  sizeof (int), 1, f);
+		fwrite(begin->desiredOutput, sizeof (int), size_outputs, f);
+	}
+}
+
+/*
+** Build an array of trainingData from a binary file.
+*/
+void readDataBase(FILE                 *f,
+                  struct TrainingData  *td[], // ref ptr
+				  size_t               *size_td,
+				  size_t               *size_inputs,
+				  size_t               *size_outputs)
+{
+// Read sizes
+	fread((size_td), sizeof (size_t), 1, f);
+	fread((size_inputs), sizeof (size_t), 1, f);
+	fread((size_outputs), sizeof (size_t), 1, f);
+
+// Allocate
+	*td = malloc(sizeof (struct TrainingData) * (*size_td));
+	struct TrainingData *begin = *td;
+	struct TrainingData *end = *td + *size_td;
+	for (; begin < end; ++begin)
+	{
+		begin->trainingInputs = malloc(sizeof (float) * (*size_inputs));
+		fread(begin->trainingInputs,  sizeof (float), *size_inputs, f);
+		fread(&(begin->res),  sizeof (int), 1, f);
+		begin->desiredOutput = malloc(sizeof (int) * (*size_outputs));
+		fread(begin->desiredOutput, sizeof (int), *size_outputs, f);
+	}
+}
+
+
 void freeMemoryNetwork(struct Network *n)
 {
 	// free(n->layers); will cause invalid read
@@ -527,6 +587,17 @@ void freeMemoryNetwork(struct Network *n)
         }
 	free(n->layers);
 	free(n->nbNeurons);
+}
+
+void freeMemoryTD(struct TrainingData *td[], size_t size_td)
+{
+	struct TrainingData *begin = *td;
+	struct TrainingData *end = *td + size_td;
+	for (; begin < end; ++begin)
+	{
+		free(begin->trainingInputs);
+		free(begin->desiredOutput);
+	}
 }
 
 void randomInit(struct Network *n)
@@ -565,7 +636,7 @@ int outputVectorToIndex(int outputs[], int size)
 }
 
 // BUILD TEXT FILE FUNCTIONS
-int isAcceptedByNeuralNetwork(float *input)
+int isAcceptedByNeuralNetwork(float input[])
 {
   // USELESS CURRENTLY
   // IF NOT A SINGLE CHARACTER (LIKE \N)
@@ -577,7 +648,7 @@ int isAcceptedByNeuralNetwork(float *input)
   return 1;
 }
 
-int specialTreatment(float *input)
+int specialTreatment(float input[])
 {
   // USELESS CURRENTLY
   // CONVERT SPECIAL INPUT TO CHAR
@@ -595,9 +666,9 @@ int outputIntToChar(int outputInt)
 
 
 void buildResultFile(struct Network *n,
-                     float **inputs,
-                     size_t len,
-                     char *fileName)
+                     float          *inputs[],
+					 size_t          len,
+					 char            fileName[])
 {
   FILE* f = fopen(fileName, "w");
   size_t i = 0;
@@ -619,11 +690,10 @@ void buildResultFile(struct Network *n,
   fclose(f);
 }
 
-
 int main()
 {
-// Loading neural network
-	srand(time(NULL));
+// Loading neural network, from a text file or randomly
+	srand(time(NULL)); // for random
 	struct Network *network = malloc(sizeof (struct Network));
 
 	char mode[50];
@@ -646,19 +716,23 @@ int main()
 // Training
 
 	int evalres = 0;
+	size_t size_inputs = 2;
+	size_t size_outputs = 2;
 
+// Learning parameters
 	size_t size_td = 4;
 	int epochs = 10000;
 	int mini_batch_size = 2;
 	float eta = 4.0;
 
+// inputs for training
 	float _testInputs00[] = {0.0,0.0};
 	float _testInputs01[] = {0.00,1.0};
 	float _testInputs10[] = {1.00,0.00};
 	float _testInputs11[] = {1.00,1.00};
 
-	struct TrainingData* td =
-	 malloc(size_td * sizeof(struct TrainingData));
+// build manually struct TrainingData, assign outputs
+	struct TrainingData *td = malloc(size_td * sizeof (struct TrainingData));
 
 	td[0].trainingInputs = _testInputs00;
 	td[0].res = 0;
@@ -675,6 +749,24 @@ int main()
 	td[3].trainingInputs = _testInputs11;
 	td[3].res = 0;
 	td[3].desiredOutput = indexOutputToVector(td[3].res, 2);
+
+// Save trainingData in a binary file
+	FILE *fileTD = fopen("trainingData", "wb");
+	buildDataBase(fileTD, td, size_td, size_inputs, size_outputs);
+	fclose(fileTD);
+
+// Free memory, only desiredOutput has been malloc
+	free(td[0].desiredOutput);
+	free(td[1].desiredOutput);
+	free(td[2].desiredOutput);
+	free(td[3].desiredOutput);
+	free(td);
+
+// Load trainingData from the binary file
+	fileTD = fopen("trainingData", "rb");
+	td = NULL;
+	readDataBase(fileTD, &td, &size_td, &size_inputs, &size_outputs);
+	fclose(fileTD);
 
 	float *res;
 	float *res2;
@@ -707,10 +799,13 @@ int main()
 
 // Training and evaluation (loop)
 
+// use SGD for learning
 	SGD(network, td, size_td, epochs, mini_batch_size, eta);
-	evalres = evaluate(network, td, 4);
 
 	printNetwork(network);
+
+// Evaluation
+	evalres = evaluate(network, td, 4);
 	printf("\nEvaluation : %d / 4 --> ", evalres);
 
 	res = feedforward(network, 1, _testInputs00);
@@ -718,8 +813,7 @@ int main()
 	res3 = feedforward(network, 1, _testInputs10);
 	res4 = feedforward(network, 1, _testInputs11);
 
-
-	if (evalres != 4)
+	if (evalres != 4) // FAIL
 	{
 	printf("FAIL\n");
 	printf("\nTests results (FAILED):\n");
@@ -744,11 +838,11 @@ int main()
 	free(res3);
 	free(res4);
 	}
-	else
+	else // SUCCESS
 		printf("SUCCESS\n");
 	} while (evalres != 4);
 
-// Tests results
+// Print tests results in the shell
 
 	printf("\nTests results:\n");
 	printf("%.0f XOR %.0f\n", _testInputs00[0], _testInputs00[1]);
@@ -764,6 +858,7 @@ int main()
 	printf("= %f %f\n", res4[0],res4[1]);
 	printf("%d\n\n", highest(res4,2));
 
+// Print results in a text file
 	printf("Print results in file 'results'\n");
 
 	float **evaluationInputs = malloc(4 * sizeof(float *));
@@ -773,7 +868,7 @@ int main()
 	evaluationInputs[3] = _testInputs11;
 	buildResultFile(network, evaluationInputs, 4, "results");
 
-//Save
+// Save weights in a text file
 	if (evalres == 4)
 	{
 		printf("Write weights file? no/fileName\n");
@@ -782,18 +877,14 @@ int main()
 			writeWeightsFile(network, fileName);
 	}
 
-//Free memory
-	free(td[0].desiredOutput);
-	free(td[1].desiredOutput);
-	free(td[2].desiredOutput);
-	free(td[3].desiredOutput);
+// Free memory
+	freeMemoryTD(&td, size_td);
 	free(td);
 	free(res);
 	free(res2);
 	free(res3);
 	free(res4);
 	free(evaluationInputs);
-
 	freeMemoryNetwork(network);
 	free(network);
 	printf("End\n");
