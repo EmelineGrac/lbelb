@@ -49,8 +49,8 @@ float* feedforward(struct Network *n,
                    float           inputsVect[]);
 int test(struct Network *n, float inputsVect[]);
 size_t evaluate(struct Network      *n,
-             struct TrainingData  td[],
-             size_t               size_td);
+               struct TrainingData  td[],
+               size_t               size_td);
 void backprop(struct Network *n,
               float           trainingInputs[],
               int             desiredOutput[]);
