@@ -1,51 +1,54 @@
 # include <stdlib.h>
 # include <stdio.h>
 
+#ifndef NETWORK_H_
+#define NETWORK_H_
+
 struct Neuron
 {
-    float bias;
-    int   nbInputs;
-    float weights[];
-    float nabla_b;
-    float delta_nabla_b;
-    float nabla_w[];
-    float delta_nabla_w[];
-    float activation;
-    float z;
+    float  bias;
+    int    nbInputs;
+    float *weights;
+    float  nabla_b;
+    float  delta_nabla_b;
+    float *nabla_w;
+    float *delta_nabla_w;
+    float  activation;
+    float  z;
 };
 
 struct Layer
 {
-    int           nbNeurons;
-    struct Neuron neurons[];
-    float         sum_outputs;
+    int            nbNeurons;
+    struct Neuron *neurons;
+    float          sum_outputs;
 };
 
 struct Network
 {
-    int          nbLayers;
-    int          nbNeurons[];
-    struct Layer layers[];
+    int           nbLayers;
+    int          *nbNeurons;
+    struct Layer *layers;
 };
 
 struct TrainingData
 {
-    float trainingInputs[];
+    float *trainingInputs;
     int   res;
-    int   desiredOutput[];
+    int   *desiredOutput;
 };
 
-inline float sigmoid(float z);
-inline float sigmoid_prime(float z);
-inline float cost_derivative(float output_activation, int y);
-inline float softmax(struct Network *n, int j);
+float sigmoid(float z);
+float sigmoid_prime(float z);
+float cost_derivative(float output_activation, int y);
+float softmax(struct Network *n, int j);
 double random_normal(void);
 int highest(float result[], int size);
 float* feedforward(struct Network *n,
                    int             iLayer,
                    float           inputsVect[]);
 int test(struct Network *n, float inputsVect[]);
-int evaluate(struct Network      *n,
+size_t evaluate(struct Network      *n,
              struct TrainingData  td[],
              size_t               size_td);
 void backprop(struct Network *n,
@@ -78,7 +81,7 @@ void readDataBase(FILE                 *f,
                   size_t               *size_td,
                   size_t               *size_inputs,
                   size_t               *size_outputs);
-void freeMemoryNetwork(struct Network* n);
+void freeMemoryNetwork(struct Network *n);
 void freeMemoryTD(struct TrainingData *td[], size_t size_td);
 void randomInit(struct Network *n);
 int* indexOutputToVector(int index, size_t len);
@@ -89,3 +92,4 @@ void buildResultFile(struct Network *n,
                      float          *inputs[],
                      size_t          len,
                      char            fileName[]);
+#endif /* NETWORK_H_ */

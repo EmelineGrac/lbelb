@@ -3,10 +3,15 @@
 #include <math.h>
 #include <time.h>
 #include <string.h>
+
 #include "network.h"
 
 #ifndef PI
 #define PI 3.14159265358979323846
+#endif
+
+#ifndef XOR
+#define XOR 0 // 1 = specific demo for XOR
 #endif
 
 inline float sigmoid(float z)
@@ -126,11 +131,11 @@ int test(struct Network *n, float inputsVect[])
 ** network's output is assumed to be the index of whichever
 ** neuron in the final layer has the highest activation.
 */
-int evaluate(struct Network      *n,
+size_t evaluate(struct Network      *n,
              struct TrainingData  td[],
              size_t               size_td)
 {
- int res = 0;
+ size_t res = 0;
  float *activations;
 
  for (size_t i = 0; i < size_td; i++)
@@ -699,10 +704,10 @@ int main()
     char mode[50];
     char fileName[50];
 
-    printf("Mode: loadWeightsFile, new\n");
+    printf("Mode: loadWeightsFile(l), new(n)\n");
     scanf("%s", mode);
 
-    if (strcmp(mode,"loadWeightsFile") == 0)
+    if (strcmp(mode,"l") == 0)
     {
         printf("fileName: ");
         scanf("%s", fileName);
@@ -712,19 +717,20 @@ int main()
         randomInit(network);
     printNetwork(network);
 
-
 // Training
 
-    int evalres = 0;
+    size_t evalres = 0;
+    FILE  *fileTD = NULL;
+    size_t size_td = 4;
     size_t size_inputs = 2;
     size_t size_outputs = 2;
-
+    struct TrainingData *td;
 // Learning parameters
-    size_t size_td = 4;
     int epochs = 10000;
     int mini_batch_size = 2;
     float eta = 4.0;
 
+#if XOR
 // inputs for training
     float _testInputs00[] = {0.0,0.0};
     float _testInputs01[] = {0.00,1.0};
@@ -732,7 +738,7 @@ int main()
     float _testInputs11[] = {1.00,1.00};
 
 // build manually struct TrainingData, assign outputs
-    struct TrainingData *td = malloc(size_td * sizeof (struct TrainingData));
+    td = malloc(size_td * sizeof (struct TrainingData));
 
     td[0].trainingInputs = _testInputs00;
     td[0].res = 0;
@@ -751,7 +757,7 @@ int main()
     td[3].desiredOutput = indexOutputToVector(td[3].res, 2);
 
 // Save trainingData in a binary file
-    FILE *fileTD = fopen("trainingData", "wb");
+    fileTD = fopen("trainingData.bin", "wb");
     buildDataBase(fileTD, td, size_td, size_inputs, size_outputs);
     fclose(fileTD);
 
@@ -761,30 +767,34 @@ int main()
     free(td[2].desiredOutput);
     free(td[3].desiredOutput);
     free(td);
+#endif
 
 // Load trainingData from the binary file
-    fileTD = fopen("trainingData", "rb");
+    fileTD = fopen("trainingData.bin", "rb");
     td = NULL;
     readDataBase(fileTD, &td, &size_td, &size_inputs, &size_outputs);
     fclose(fileTD);
 
+#if XOR
     float *res;
     float *res2;
     float *res3;
     float *res4; // = calloc(2, sizeof(float));
     // memory already allocated in feedforward
-
+#endif
 
 // First evaluation
-    evalres = evaluate(network, td, 4);
-    printf("\nEvaluation : %d / 4 --> ", evalres);
+    evalres = evaluate(network, td, size_td);
+    printf("\nEvaluation : %zu / %zu --> ", evalres, size_td);
 
-    if (evalres != 4)
+    if (evalres != size_td)
         printf("FAIL\n");
     else
         printf("SUCCESS\n");
 
+#if XOR
     do {
+#endif
     printf("\nUse SGD for training (XOR)\n");
     printf("\nepochs: ");
     scanf("%d", &epochs);
@@ -805,9 +815,10 @@ int main()
     printNetwork(network);
 
 // Evaluation
-    evalres = evaluate(network, td, 4);
-    printf("\nEvaluation : %d / 4 --> ", evalres);
+    evalres = evaluate(network, td, size_td);
+    printf("\nEvaluation : %zu / %zu --> ", evalres, size_td);
 
+#if XOR
     res = feedforward(network, 1, _testInputs00);
     res2 = feedforward(network, 1, _testInputs01);
     res3 = feedforward(network, 1, _testInputs10);
@@ -867,11 +878,11 @@ int main()
     evaluationInputs[2] = _testInputs10;
     evaluationInputs[3] = _testInputs11;
     buildResultFile(network, evaluationInputs, 4, "results");
-
+#endif
 // Save weights in a text file
-    if (evalres == 4)
+    if (evalres == size_td)
     {
-        printf("Write weights file? no/fileName\n");
+        printf("\nWrite weights file? no/fileName\n");
         scanf("%s", fileName);
         if (strcmp("no", fileName) != 0)
             writeWeightsFile(network, fileName);
@@ -880,11 +891,13 @@ int main()
 // Free memory
     freeMemoryTD(&td, size_td);
     free(td);
+#if XOR
     free(res);
     free(res2);
     free(res3);
     free(res4);
     free(evaluationInputs);
+#endif
     freeMemoryNetwork(network);
     free(network);
     printf("End\n");
