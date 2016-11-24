@@ -10,6 +10,18 @@
 #define PI 3.14159265358979323846
 #endif
 
+#ifndef WEIGHTS_FILE
+#define WEIGHTS_FILE "tmp_weights"
+#endif
+
+#ifndef RESULTS_FILE
+#define RESULTS_FILE "tmp_results"
+#endif
+
+#ifndef DATABASE
+#define DATABASE "trainingData.bin"
+#endif
+
 #ifndef XOR
 #define XOR 0 // 1 = specific demo for XOR
 #endif
@@ -744,7 +756,7 @@ int main()
     float eta = 4.0;
 
 // Load trainingData from the binary file
-    fileTD = fopen("trainingData.bin", "rb");
+    fileTD = fopen(DATABASE, "rb");
     td = NULL;
     readDataBase(fileTD, &td, &size_td, &size_inputs, &size_outputs);
     fclose(fileTD);
@@ -802,16 +814,11 @@ int main()
     printf("Evaluation : %zu / %zu\n", evalres, size_td);
 
 // Save weights in a text file
-    if (evalres == size_td)
-    {
-        printf("Write weights file? (no/fileName) ");
-        scanf("%s", fileName);
-        if (strcmp("no", fileName) != 0)
-            writeWeightsFile(network, fileName);
-    }
+    writeWeightsFile(network, WEIGHTS_FILE);
+    printf("Print weights in file '%s'\n", WEIGHTS_FILE);
 // Save results
-    printf("Print results in file 'results'\n");
-    buildResultFileTraining(network, td, size_td, "results");
+    buildResultFileTraining(network, td, size_td, RESULTS_FILE);
+    printf("Print results in file '%s'\n", RESULTS_FILE);
 
 // Free memory
     freeMemoryTD(&td, size_td);
