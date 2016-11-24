@@ -83,7 +83,8 @@ void readDataBase(FILE                 *f,
                   size_t               *size_outputs);
 void freeMemoryNetwork(struct Network *n);
 void freeMemoryTD(struct TrainingData *td[], size_t size_td);
-void randomInit(struct Network *n);
+void randomInitScanf(struct Network *n);
+void randomInit(struct Network *n, int input, int hidden, int output);
 int* indexOutputToVector(int index, size_t len);
 int isAcceptedByNeuralNetwork(float input[]);
 int specialTreatment(float input[]);
@@ -92,4 +93,8 @@ void buildResultFile(struct Network *n,
                      float          *inputs[],
                      size_t          len,
                      char            fileName[]);
+void buildResultFileTraining(struct Network      *n,
+                             struct TrainingData  td[],
+                             size_t               len,
+                             char                 fileName[]);
 #endif /* NETWORK_H_ */

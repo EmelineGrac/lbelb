@@ -605,24 +605,33 @@ void freeMemoryTD(struct TrainingData *td[], size_t size_td)
     }
 }
 
-void randomInit(struct Network *n)
+void randomInitScanf(struct Network *n)
 {
     int n1, n2, n3;
 
-    printf("\nNumber of neurons on layer 1: ");
+    printf("Number of neurons on layer 1: ");
     scanf("%d", &n1);
 
-    printf("\nNumber of neurons on layer 2: ");
+    printf("Number of neurons on layer 2: ");
     scanf("%d", &n2);
 
-    printf("\nNumber of neurons on layer 3: ");
+    printf("Number of neurons on layer 3: ");
     scanf("%d", &n3);
 
     int *_nbNeurons = malloc(3 * sizeof (int));
     *_nbNeurons = n1;
     *(_nbNeurons + 1) = n2;
     *(_nbNeurons + 2) = n3;
-    printf("\nRandom biases and weights:\n");
+    printf("Random biases and weights\n");
+    initNetwork(n, 3, _nbNeurons);
+}
+
+void randomInit(struct Network *n, int input, int hidden, int output)
+{
+    int *_nbNeurons = malloc(3 * sizeof (int));
+    *_nbNeurons = input;
+    *(_nbNeurons + 1) = hidden;
+    *(_nbNeurons + 2) = output;
     initNetwork(n, 3, _nbNeurons);
 }
 
@@ -665,7 +674,7 @@ int specialTreatment(float input[])
 int outputIntToChar(int outputInt)
 {
   // CONVERT TO ASCII CODE
-  int c_res = outputInt + 48;
+  int c_res = outputInt + 32;
   return c_res;
 }
 
@@ -692,10 +701,128 @@ void buildResultFile(struct Network *n,
      }
      fputc(c_res, f);
   }
+  fputc('\n', f);
+  fclose(f);
+}
+
+void buildResultFileTraining(struct Network      *n,
+                             struct TrainingData  td[],
+                             size_t               len,
+                             char                 fileName[])
+{
+  FILE* f = fopen(fileName, "w");
+  size_t i = 0;
+  int res = 0;
+  int c_res = 0;
+  for (; i < len; i++)
+  {
+        res = test(n, td[i].trainingInputs);
+        c_res = outputIntToChar(res);
+
+     fputc(c_res, f);
+  }
+  fputc('\n', f);
   fclose(f);
 }
 
 int main()
+{
+// Loading neural network, from a text file or randomly
+    srand(time(NULL)); // for random
+    struct Network *network = malloc(sizeof (struct Network));
+
+// Database parameters
+    size_t evalres = 0;
+    FILE  *fileTD = NULL;
+    size_t size_td = 4;
+    size_t size_inputs = 2;
+    size_t size_outputs = 2;
+    struct TrainingData *td;
+// Learning parameters
+    int epochs = 10000;
+    int mini_batch_size = 2;
+    float eta = 4.0;
+
+// Load trainingData from the binary file
+    fileTD = fopen("trainingData.bin", "rb");
+    td = NULL;
+    readDataBase(fileTD, &td, &size_td, &size_inputs, &size_outputs);
+    fclose(fileTD);
+
+// Initialiaze the neural net
+    char mode[50];
+    char fileName[50];
+    printf("Mode: loadWeightsFile(l), new(n) ");
+
+    scanf("%s", mode);
+    if (strcmp(mode,"l") == 0)
+    {
+        printf("fileName: ");
+        scanf("%s", fileName);
+        openWeightsFile(network, fileName);
+        if (network->nbNeurons[0] != (int)size_inputs) //bad
+        {
+            printf("Error on the number of neurons on the input layer: \
+    network has %d inputs but size_inputs = %zu.\n", network->nbNeurons[0],
+    size_inputs);
+            return 1;
+        }
+        if (network->nbNeurons[2] != (int)size_outputs)
+        {
+            printf("Error on the number of neurons on the output layer: \
+    network has %d outputs but size_outputs = %zu.\n", network->nbNeurons[2],
+    size_outputs);
+            return 1;
+        }
+    }
+    else
+    {
+        int hidden = 2;
+        printf("Number of neurons on the hidden layer: ");
+        scanf("%d", &hidden);
+        randomInit(network, size_inputs, hidden, size_outputs);
+    }
+
+// Define learning parameters
+    printf("(SGD) Size of TrainingData: %zu\n", size_td);
+    printf("epochs: ");
+    scanf("%d", &epochs);
+    printf("mini_batch_size: ");
+    scanf("%d", &mini_batch_size);
+    printf("eta: ");
+    scanf("%f", &eta);
+
+// use SGD for learning
+    SGD(network, td, size_td, epochs, mini_batch_size, eta);
+
+//  printNetwork(network);
+
+// Evaluation
+    evalres = evaluate(network, td, size_td);
+    printf("Evaluation : %zu / %zu\n", evalres, size_td);
+
+// Save weights in a text file
+    if (evalres == size_td)
+    {
+        printf("Write weights file? (no/fileName) ");
+        scanf("%s", fileName);
+        if (strcmp("no", fileName) != 0)
+            writeWeightsFile(network, fileName);
+    }
+// Save results
+    printf("Print results in file 'results'\n");
+    buildResultFileTraining(network, td, size_td, "results");
+
+// Free memory
+    freeMemoryTD(&td, size_td);
+    free(td);
+    freeMemoryNetwork(network);
+    free(network);
+    return 0;
+}
+
+
+int main_xor()
 {
 // Loading neural network, from a text file or randomly
     srand(time(NULL)); // for random
@@ -714,8 +841,10 @@ int main()
         openWeightsFile(network, fileName);
     }
     else
-        randomInit(network);
+        randomInitScanf(network);
+#if XOR
     printNetwork(network);
+#endif
 
 // Training
 
@@ -783,7 +912,8 @@ int main()
     // memory already allocated in feedforward
 #endif
 
-// First evaluation
+#if XOR
+// First evaluation: random
     evalres = evaluate(network, td, size_td);
     printf("\nEvaluation : %zu / %zu --> ", evalres, size_td);
 
@@ -791,6 +921,7 @@ int main()
         printf("FAIL\n");
     else
         printf("SUCCESS\n");
+#endif
 
 #if XOR
     do {
