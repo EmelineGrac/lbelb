@@ -1,3 +1,4 @@
+#if 0 == 1
 /*
 Jeu d'images pour l'apprentissage de caractères:
 Il nous faudrait au moins une image pour chaque caractere à reconnaitre,
@@ -11,7 +12,7 @@ Par exemple, les images représentant les 'é','ê','è' seront considérés com
 des 'e' par le réseau de neurones (plus simple à gérer)
 Les images seront de même dimension et le caractère sera centré.
 Il faut qu'on définisse une taille pour les images
-On binarise l'image en un tableau de flottants à 1 dimension. 
+On binarise l'image en un tableau de flottants à 1 dimension.
 On associe l'image binarisée au caractère correspondant
 par l'intermediaire de cette structure:
 */
@@ -39,6 +40,7 @@ FILE *fileTD = fopen("trainingData.bin", "wb");
 size_t size_td = |A|; //nombre d'images, taille de l'ensemble A et de td[]
 size_t size_inputs = x*y; // taille de l'image en pixels
 size_t size_outputs = |B|; // nb de caractères réellement gérés par le réseau
+
 // Allocation de td[]
 struct TrainingData *td = malloc(size_td * sizeof (struct TrainingData));
 
@@ -47,12 +49,12 @@ td[0].trainingInputs = {0,}; // tableau de 0
 td[0].res = 0; // caractere SPACE, 32-32 = 0
 td[0].desiredOutput = indexOutputToVector(td[0].res, size_outputs);
 // ...
-// Plusieurs td[n] pourront avoir le même res ! 
+// Plusieurs td[n] pourront avoir le même res !
 // caractères concernés: 97(a), 99(c), 101(e), 105(i), 111(o), 117(u)...
 // exemple: f((img)e)) = 'e' et f((img)é) = 'e'
 // ...
 td[size_td - 1].trainingInputs = ...
-td[size_td - 1].res = ... 
+td[size_td - 1].res = ...
 td[size_td - 1].desiredOutput = indexOutputToVector(td[size_td - 1].res,
                                                     size_outputs);
 // size_outputs - 1 sera le "res" maximal
@@ -63,6 +65,8 @@ fclose(fileTD);
 
 /*
 En résumé, il faut une fonction capable de construire le jeu de données
-depuis un ensemble d'images deja decoupées et redimensionnées,
-puis de le sauvegarder dans un fichier binaire. 
+(tableau de struct TrainingData) depuis un ensemble d'images deja decoupées
+et redimensionnées. Ensuite, il faut sauvegarder le jeu de donnees
+dans un fichier binaire avec buildDataBase.
 */
+#endif

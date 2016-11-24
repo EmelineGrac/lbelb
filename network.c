@@ -132,8 +132,8 @@ int test(struct Network *n, float inputsVect[])
 ** neuron in the final layer has the highest activation.
 */
 size_t evaluate(struct Network      *n,
-             struct TrainingData  td[],
-             size_t               size_td)
+               struct TrainingData  td[],
+               size_t               size_td)
 {
  size_t res = 0;
  float *activations;
