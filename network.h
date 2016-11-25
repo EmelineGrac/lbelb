@@ -64,6 +64,12 @@ void SGD(struct Network      *n,
          int                  epochs,
          int                  mini_batch_size,
          float                eta);
+void SGD_eval(struct Network      *n,
+              struct TrainingData  td[],
+              size_t               size_td,
+              int                  epochs,
+              int                  mini_batch_size,
+              float                eta);
 void initNeuron(struct Neuron *_neuron, float _bias, int _nbInputs);
 void initLayer(struct Layer *_layer, int _nbNeurons, int _nbInputs);
 void initNetwork(struct Network *_network, int _nbLayers, int *_nbNeurons);

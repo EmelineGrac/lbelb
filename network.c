@@ -370,6 +370,30 @@ void SGD(struct Network      *n,
   }
 }
 
+/*
+** Same but with evaluation for each epoch
+*/
+void SGD_eval(struct Network      *n,
+              struct TrainingData  td[],
+              size_t               size_td,
+              int                  epochs,
+              int                  mini_batch_size,
+              float                eta)
+{
+  struct TrainingData *k = td;
+  struct TrainingData *k_end = td + size_td;
+
+  for (int j = 0; j < epochs; j++)
+  {
+    // random.shuffle(td);
+    k = td;
+    for (; k < k_end; k += mini_batch_size)
+        update_mini_batch(n, k, k + mini_batch_size, eta);
+
+    unsigned evalres = evaluate(n, td, size_td);
+    printf("Epoch %d: %d / %zu\n", j, evalres, size_td);
+  }
+}
 
 void initNeuron(struct Neuron *_neuron, float _bias, int _nbInputs)
 {
@@ -756,6 +780,8 @@ int main()
     int mini_batch_size = 2;
     float eta = 4.0;
 
+    int eval_during_training = 1; // 0 = FALSE
+
 // Load trainingData from the binary file
     fileTD = fopen(DATABASE, "rb");
     td = NULL;
@@ -805,7 +831,10 @@ int main()
     scanf("%f", &eta);
 
 // use SGD for learning
-    SGD(network, td, size_td, epochs, mini_batch_size, eta);
+    if (eval_during_training)
+        SGD_eval(network, td, size_td, epochs, mini_batch_size, eta);
+    else
+        SGD(network, td, size_td, epochs, mini_batch_size, eta);
 
 //  printNetwork(network);
 
