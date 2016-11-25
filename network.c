@@ -751,6 +751,7 @@ int main()
     size_t size_outputs = 2;
     struct TrainingData *td;
 // Learning parameters
+    int hidden = 2;
     int epochs = 10000;
     int mini_batch_size = 2;
     float eta = 4.0;
@@ -789,7 +790,6 @@ int main()
     }
     else
     {
-        int hidden = 2;
         printf("Number of neurons on the hidden layer: ");
         scanf("%d", &hidden);
         randomInit(network, size_inputs, hidden, size_outputs);
