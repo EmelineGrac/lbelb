@@ -86,7 +86,7 @@ int highest(float result[], int size)
 ** return the output of the network if inputsVect is input
 ** input layer = 0
 */
-float* feedforward(struct Network *n,
+float *feedforward(struct Network *n,
                    int             iLayer,
                    float           inputsVect[])
 {
@@ -95,8 +95,8 @@ float* feedforward(struct Network *n,
     else
     {
         int j = 0;
-        float* outputsVect = calloc(n->layers[iLayer].nbNeurons,
-                        sizeof (float));
+        float *outputsVect = calloc(n->layers[iLayer].nbNeurons,
+                                    sizeof (float));
         struct Neuron *nr = &(n->layers[iLayer].neurons[0]);
         n->layers[iLayer].sum_outputs = 0.0;
         while (j < n->layers[iLayer].nbNeurons)
@@ -129,9 +129,9 @@ float* feedforward(struct Network *n,
 int test(struct Network *n, float inputsVect[])
 {
   int res;
-  float *activations;
+  float *activations = NULL;
   activations = feedforward(n, 1, inputsVect);
-  res = highest(activations, n->layers[n->nbLayers-1].nbNeurons);
+  res = highest(activations, n->layers[n->nbLayers - 1].nbNeurons);
   free(activations);
   return res;
 }
@@ -144,16 +144,16 @@ int test(struct Network *n, float inputsVect[])
 ** neuron in the final layer has the highest activation.
 */
 size_t evaluate(struct Network      *n,
-               struct TrainingData  td[],
-               size_t               size_td)
+                struct TrainingData  td[],
+                size_t               size_td)
 {
  size_t res = 0;
- float *activations;
+ float *activations = NULL;
 
  for (size_t i = 0; i < size_td; i++)
  {
    activations = feedforward(n, 1, td[i].trainingInputs);
-   if (highest(activations, n->layers[n->nbLayers-1].nbNeurons) == td[i].res)
+   if (highest(activations, n->layers[n->nbLayers - 1].nbNeurons) == td[i].res)
      res++;
    free(activations);
  }
@@ -290,12 +290,12 @@ void backprop(struct Network *n,
 ** eta is the learning rate.
 */
 void update_mini_batch(struct Network      *n,
-                       struct TrainingData *k,
-                       struct TrainingData *k_end,
+                       struct TrainingData *td,
+                       struct TrainingData *td_end,
                        float                eta)
 {
- int i, j, kk;
- size_t len = k_end - k;
+ int i, j, k;
+ size_t len = td_end - td;
  struct Neuron *nr;
 
  for (i = 0; i < n->nbLayers; i++)
@@ -305,17 +305,17 @@ void update_mini_batch(struct Network      *n,
       nr = &(n->layers[i].neurons[j]);
       nr->nabla_b = 0;
       nr->delta_nabla_b = 0;
-      for (kk = 0; kk < nr->nbInputs; kk++)
+      for (k = 0; k < nr->nbInputs; k++)
       {
-        nr->nabla_w[kk] = 0;
-        nr->delta_nabla_w[kk] = 0;
+        nr->nabla_w[k] = 0;
+        nr->delta_nabla_w[k] = 0;
       }
     }
  }
 
- for(; k < k_end; k++)
+ for(; td < td_end; td++)
  {
-    backprop(n, k->trainingInputs, k->desiredOutput);
+    backprop(n, td->trainingInputs, td->desiredOutput);
 
     for (i = 0; i < n->nbLayers; i++)
     {
@@ -324,8 +324,8 @@ void update_mini_batch(struct Network      *n,
         nr = &(n->layers[i].neurons[j]);
         nr->nabla_b += nr->delta_nabla_b;
 
-        for (kk = 0; kk < nr->nbInputs;kk++)
-          nr->nabla_w[kk] += nr->delta_nabla_w[kk];
+        for (k = 0; k < nr->nbInputs; k++)
+          nr->nabla_w[k] += nr->delta_nabla_w[k];
       }
     }
  }
@@ -336,8 +336,8 @@ void update_mini_batch(struct Network      *n,
     {
       nr = &(n->layers[i].neurons[j]);
       nr->bias -= ((eta/len) * (nr->nabla_b));
-      for (kk = 0; kk < n->layers[i].neurons[j].nbInputs;kk++)
-        nr->weights[kk] -= ((eta/len) * (nr->nabla_w[kk]));
+      for (k = 0; k < n->layers[i].neurons[j].nbInputs; k++)
+        nr->weights[k] -= ((eta/len) * (nr->nabla_w[k]));
     }
   }
 }
@@ -358,15 +358,15 @@ void SGD(struct Network      *n,
          int                  mini_batch_size,
          float                eta)
 {
-  struct TrainingData *k = td;
-  struct TrainingData *k_end = td + size_td;
+  struct TrainingData *begin = td;
+  struct TrainingData *end   = td + size_td;
 
   for (int j = 0; j < epochs; j++)
   {
     // random.shuffle(td);
-    k = td;
-    for (; k < k_end; k += mini_batch_size)
-        update_mini_batch(n, k, k + mini_batch_size, eta);
+    begin = td;
+    for (; begin < end; begin += mini_batch_size)
+        update_mini_batch(n, begin, begin + mini_batch_size, eta);
   }
 }
 
@@ -380,15 +380,15 @@ void SGD_eval(struct Network      *n,
               int                  mini_batch_size,
               float                eta)
 {
-  struct TrainingData *k = td;
-  struct TrainingData *k_end = td + size_td;
+  struct TrainingData *begin = td;
+  struct TrainingData *end   = td + size_td;
 
   for (int j = 0; j < epochs; j++)
   {
     // random.shuffle(td);
-    k = td;
-    for (; k < k_end; k += mini_batch_size)
-        update_mini_batch(n, k, k + mini_batch_size, eta);
+    begin = td;
+    for (; begin < end; begin += mini_batch_size)
+        update_mini_batch(n, begin, begin + mini_batch_size, eta);
 
     unsigned evalres = evaluate(n, td, size_td);
     printf("Epoch %d: %d / %zu\n", j, evalres, size_td);
@@ -440,7 +440,7 @@ void initNetwork(struct Network *_network, int _nbLayers, int *_nbNeurons)
 
     for (int i = 0; i < _nbLayers; i++)
     {
-        initLayer(&_layers[i], _nbNeurons[i],_nbInputs);
+        initLayer(&_layers[i], _nbNeurons[i], _nbInputs);
         _nbInputs = _layers[i].nbNeurons;
     }
 
@@ -470,19 +470,19 @@ void printNetwork(struct Network *n)
     int *end = n->nbNeurons + n->nbLayers;
     array_print(begin, end);
     for (int i = 0; i < n->nbLayers; i++)
-        {
-        printf("Layer %d (", i);
-        printf("%d neurons):\n", n->layers[i].nbNeurons);
+    {
+      printf("Layer %d (", i);
+      printf("%d neurons):\n", n->layers[i].nbNeurons);
       for (int j = 0; j < n->layers[i].nbNeurons; j++)
+      {
+        printf("     Neuron %d: ", j);
+        printf("bias = %f\n", n->layers[i].neurons[j].bias);
+          for (int k = 0; k < n->layers[i].neurons[j].nbInputs; k++)
           {
-       printf("     Neuron %d: ", j);
-       printf("bias = %f\n", n->layers[i].neurons[j].bias);
-         for (int k = 0; k < n->layers[i].neurons[j].nbInputs; k++)
-             {
-           printf("               weight = %f\n",
+             printf("               weight = %f\n",
              n->layers[i].neurons[j].weights[k]);
-         }
           }
+      }
     }
 }
 
@@ -515,11 +515,10 @@ void openWeightsFile(struct Network *n, char fileName[])
            ll = nr->nbInputs - 1;
            for (k = 0; k < ll; k++)
               fscanf(f, "%f ", &(nr->weights[k]));
-               fscanf(f, "%f\n", &(nr->weights[ll]));
-            }
-            else
-               fscanf(f, "\n");
-
+              fscanf(f, "%f\n", &(nr->weights[ll]));
+        }
+        else
+            fscanf(f, "\n");
       }
     }
     fclose(f);
@@ -552,8 +551,8 @@ void writeWeightsFile(struct Network *n, char fileName[])
               fprintf(f, "%f\n", nr.weights[ll]);
         }
         else
-              fprintf(f, "\n");
-          }
+            fprintf(f, "\n");
+      }
     }
     fclose(f);
 }
@@ -569,13 +568,13 @@ void buildDataBase(FILE                *f,
                    size_t               size_outputs)
 {
 // Write sizes
-    fwrite(&(size_td), sizeof (size_t), 1, f);
-    fwrite(&(size_inputs), sizeof (size_t), 1, f);
+    fwrite(&(size_td),      sizeof (size_t), 1, f);
+    fwrite(&(size_inputs),  sizeof (size_t), 1, f);
     fwrite(&(size_outputs), sizeof (size_t), 1, f);
 
 // Write data
     struct TrainingData *begin = td;
-    struct TrainingData *end = td + size_td;
+    struct TrainingData *end   = td + size_td;
     for (; begin < end; ++begin)
     {
         fwrite(begin->trainingInputs,  sizeof (float), size_inputs, f);
@@ -594,14 +593,14 @@ void readDataBase(FILE                 *f,
                   size_t               *size_outputs)
 {
 // Read sizes
-    fread((size_td), sizeof (size_t), 1, f);
-    fread((size_inputs), sizeof (size_t), 1, f);
+    fread((size_td),      sizeof (size_t), 1, f);
+    fread((size_inputs),  sizeof (size_t), 1, f);
     fread((size_outputs), sizeof (size_t), 1, f);
 
 // Allocate
     *td = malloc(sizeof (struct TrainingData) * (*size_td));
     struct TrainingData *begin = *td;
-    struct TrainingData *end = *td + *size_td;
+    struct TrainingData *end   = *td + *size_td;
     for (; begin < end; ++begin)
     {
         begin->trainingInputs = malloc(sizeof (float) * (*size_inputs));
@@ -633,7 +632,7 @@ void freeMemoryNetwork(struct Network *n)
 void freeMemoryTD(struct TrainingData *td[], size_t size_td)
 {
     struct TrainingData *begin = *td;
-    struct TrainingData *end = *td + size_td;
+    struct TrainingData *end   = *td + size_td;
     for (; begin < end; ++begin)
     {
         free(begin->trainingInputs);
