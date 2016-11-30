@@ -354,14 +354,17 @@ void update_mini_batch(struct Network      *n,
 void SGD(struct Network      *n,
          struct TrainingData  td[],
          size_t               size_td,
-         int                  epochs,
-         int                  mini_batch_size,
+         unsigned             epochs,
+         unsigned             mini_batch_size,
          float                eta)
 {
+  if (mini_batch_size == 0)
+    mini_batch_size = 1;
+
   struct TrainingData *begin = td;
   struct TrainingData *end   = td + size_td;
 
-  for (int j = 0; j < epochs; j++)
+  for (unsigned j = 0; j < epochs; j++)
   {
     // random.shuffle(td);
     begin = td;
@@ -381,14 +384,17 @@ void SGD(struct Network      *n,
 void SGD_eval(struct Network      *n,
               struct TrainingData  td[],
               size_t               size_td,
-              int                  epochs,
-              int                  mini_batch_size,
+              unsigned             epochs,
+              unsigned             mini_batch_size,
               float                eta)
 {
+  if (mini_batch_size == 0)
+    mini_batch_size = 1;
+
   struct TrainingData *begin = td;
   struct TrainingData *end   = td + size_td;
 
-  for (int j = 0; j < epochs; j++)
+  for (unsigned j = 0; j < epochs; j++)
   {
     // random.shuffle(td);
     begin = td;
@@ -613,7 +619,7 @@ void readDataBase(FILE                 *f,
     for (; begin < end; ++begin)
     {
         begin->trainingInputs = malloc(sizeof (float) * (*size_inputs));
-        begin->desiredOutput =  malloc(sizeof (int)   * (*size_outputs));
+        begin->desiredOutput  = malloc(sizeof (int)   * (*size_outputs));
         fread(begin->trainingInputs, sizeof (float), *size_inputs,  f);
         fread(&(begin->res),         sizeof (int),    1,            f);
         fread(begin->desiredOutput,  sizeof (int),   *size_outputs, f);
@@ -783,8 +789,8 @@ int main()
     struct TrainingData *td;
 // Learning parameters
     int hidden = 2;
-    int epochs = 10000;
-    int mini_batch_size = 2;
+    unsigned epochs = 10000;
+    unsigned mini_batch_size = 2;
     float eta = 4.0;
 
     int eval_during_training = 1; // 0 = FALSE
@@ -831,9 +837,9 @@ int main()
 // Define learning parameters
     printf("(SGD) Size of TrainingData: %zu\n", size_td);
     printf("epochs: ");
-    scanf("%d", &epochs);
+    scanf("%u", &epochs);
     printf("mini_batch_size: ");
-    scanf("%d", &mini_batch_size);
+    scanf("%u", &mini_batch_size);
     printf("eta: ");
     scanf("%f", &eta);
 
@@ -898,8 +904,8 @@ int main_xor()
     size_t size_outputs = 2;
     struct TrainingData *td;
 // Learning parameters
-    int epochs = 10000;
-    int mini_batch_size = 2;
+    unsigned epochs = 10000;
+    unsigned mini_batch_size = 2;
     float eta = 4.0;
 
 #if XOR
@@ -971,9 +977,9 @@ int main_xor()
 #endif
     printf("\nUse SGD for training (XOR)\n");
     printf("\nepochs: ");
-    scanf("%d", &epochs);
+    scanf("%u", &epochs);
     printf("\nmini_batch_size: ");
-    scanf("%d", &mini_batch_size);
+    scanf("%u", &mini_batch_size);
     printf("\neta: ");
     scanf("%f", &eta);
 
