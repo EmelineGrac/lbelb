@@ -366,7 +366,12 @@ void SGD(struct Network      *n,
     // random.shuffle(td);
     begin = td;
     for (; begin < end; begin += mini_batch_size)
-        update_mini_batch(n, begin, begin + mini_batch_size, eta);
+    {
+        if (begin + mini_batch_size <= end)
+            update_mini_batch(n, begin, begin + mini_batch_size, eta);
+        else
+            update_mini_batch(n, begin, end, eta);
+    }
   }
 }
 
@@ -388,8 +393,12 @@ void SGD_eval(struct Network      *n,
     // random.shuffle(td);
     begin = td;
     for (; begin < end; begin += mini_batch_size)
-        update_mini_batch(n, begin, begin + mini_batch_size, eta);
-
+    {
+        if (begin + mini_batch_size <= end)
+            update_mini_batch(n, begin, begin + mini_batch_size, eta);
+        else
+            update_mini_batch(n, begin, end, eta);
+    }
     unsigned evalres = evaluate(n, td, size_td);
     printf("Epoch %d: %d / %zu\n", j, evalres, size_td);
   }
@@ -397,8 +406,8 @@ void SGD_eval(struct Network      *n,
 
 void initNeuron(struct Neuron *_neuron, float _bias, int _nbInputs)
 {
-    float *_weights = malloc(_nbInputs * sizeof (float));
-    float *_nabla_w = malloc(_nbInputs * sizeof (float));
+    float *_weights       = malloc(_nbInputs * sizeof (float));
+    float *_nabla_w       = malloc(_nbInputs * sizeof (float));
     float *_delta_nabla_w = malloc(_nbInputs * sizeof (float));
     float rn;
 
@@ -577,9 +586,9 @@ void buildDataBase(FILE                *f,
     struct TrainingData *end   = td + size_td;
     for (; begin < end; ++begin)
     {
-        fwrite(begin->trainingInputs,  sizeof (float), size_inputs, f);
-        fwrite(&(begin->res),  sizeof (int), 1, f);
-        fwrite(begin->desiredOutput, sizeof (int), size_outputs, f);
+        fwrite(begin->trainingInputs, sizeof (float), size_inputs,  f);
+        fwrite(&(begin->res),         sizeof (int),   1,            f);
+        fwrite(begin->desiredOutput,  sizeof (int),   size_outputs, f);
     }
 }
 
@@ -604,17 +613,16 @@ void readDataBase(FILE                 *f,
     for (; begin < end; ++begin)
     {
         begin->trainingInputs = malloc(sizeof (float) * (*size_inputs));
-        fread(begin->trainingInputs,  sizeof (float), *size_inputs, f);
-        fread(&(begin->res),  sizeof (int), 1, f);
-        begin->desiredOutput = malloc(sizeof (int) * (*size_outputs));
-        fread(begin->desiredOutput, sizeof (int), *size_outputs, f);
+        begin->desiredOutput =  malloc(sizeof (int)   * (*size_outputs));
+        fread(begin->trainingInputs, sizeof (float), *size_inputs,  f);
+        fread(&(begin->res),         sizeof (int),    1,            f);
+        fread(begin->desiredOutput,  sizeof (int),   *size_outputs, f);
     }
 }
 
 
 void freeMemoryNetwork(struct Network *n)
 {
-    // free(n->layers); will cause invalid read
     for (int j = 0; j < n->nbLayers; j++)
     {
         for (int k = 0; k < n->layers[j].nbNeurons; k++)
@@ -624,7 +632,7 @@ void freeMemoryNetwork(struct Network *n)
             free(n->layers[j].neurons[k].delta_nabla_w);
         }
         free(n->layers[j].neurons);
-        }
+    }
     free(n->layers);
     free(n->nbNeurons);
 }
