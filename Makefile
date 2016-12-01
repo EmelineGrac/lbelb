@@ -11,7 +11,6 @@ LDLIBS= `pkg-config --libs sdl` -lSDL_image -lm
 
 SRC= pixel_operations.c main.c create_array.c buildDB.c network.c
 # j'ai renomme la fonction main de main.c, desole
-
 OBJ= ${SRC:.c=.o}
 
 all: main
