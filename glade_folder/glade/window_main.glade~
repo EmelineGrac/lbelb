@@ -91,7 +91,7 @@
           <object class="GtkSpinButton">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="margin_left">4</property>
+            <property name="margin_left">5</property>
             <property name="margin_right">800</property>
           </object>
           <packing>
@@ -142,7 +142,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="margin_left">92</property>
-                <property name="margin_right">607</property>
+                <property name="margin_right">606</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
               </object>
@@ -179,8 +179,8 @@
               <object class="GtkSpinButton">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="margin_left">19</property>
-                <property name="margin_right">607</property>
+                <property name="margin_left">33</property>
+                <property name="margin_right">606</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
               </object>
@@ -216,8 +216,8 @@
               <object class="GtkSpinButton">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="margin_left">134</property>
-                <property name="margin_right">607</property>
+                <property name="margin_left">123</property>
+                <property name="margin_right">605</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
               </object>
@@ -443,7 +443,7 @@
         </child>
       </object>
     </child>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
   </object>

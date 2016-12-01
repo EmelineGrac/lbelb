@@ -91,8 +91,8 @@
           <object class="GtkSpinButton">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="margin_left">4</property>
-            <property name="margin_right">800</property>
+            <property name="margin_left">5</property>
+            <property name="margin_right">799</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -141,7 +141,7 @@
               <object class="GtkSpinButton">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="margin_left">92</property>
+                <property name="margin_left">104</property>
                 <property name="margin_right">607</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
@@ -179,8 +179,8 @@
               <object class="GtkSpinButton">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="margin_left">19</property>
-                <property name="margin_right">607</property>
+                <property name="margin_left">47</property>
+                <property name="margin_right">609</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
               </object>
@@ -242,7 +242,7 @@
             <property name="halign">start</property>
             <property name="margin_left">5</property>
             <property name="margin_top">10</property>
-            <property name="margin_bottom">33</property>
+            <property name="margin_bottom">25</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -443,7 +443,7 @@
         </child>
       </object>
     </child>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
   </object>
