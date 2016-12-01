@@ -99,7 +99,8 @@ int main2(int argc, char *argv [])
 
 
   	treatmentImag(argc, argv);
-	segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
+	int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
+	array = NULL;
 	printf("\n");//Display
 	printf("End");
        	printf("\n");
