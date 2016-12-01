@@ -118,7 +118,8 @@ void segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
          printf("\n");//Display                                                  
          //Char extraction                                                       
          int **listChar = NULL;                                                  
-         listChar = malloc(sizeof(int*) * (img->h) * (img->w));                  
+         listChar = malloc(sizeof(int*) * (img->h) * (img->w));
+	 int **debutlistChar = listChar;	 
          while (*debutListLigne != NULL){ //All line                             
                  int j=0, Bool=1, deb = 0;                                       
                  while (j < img->w){  //One line                                 
@@ -154,7 +155,10 @@ void segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
                                      *tabCharX = *((*debutListLigne + i+k));     
                                      printf("%d",*tabCharX);//Display            
                                      ++tabCharX;                                 
-                                  }                                              
+                                  }
+				  //put 20 at the end of a ligne
+				    *tabCharX = 20;
+				    ++tabCharX;
                                     printf("\n");//Display                       
                                     i+=img->w;                                   
                              }                                                   
@@ -170,8 +174,102 @@ void segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
                  ++debutListLigne;                                               
          }                                                                       
          ++listChar;                                                             
-         *listChar = NULL;                                                       
+         *listChar = NULL;              
+	 return debutlistChar;	 
          //free(listChar);                                                       
          //free(listLigne);                                                      
          //free(tabListX);                                                       
- }                                
+ }
+
+/*int* imgLetter(int* array){
+  //Compute the dimension of the array
+  size_t w = 0;
+  size_t h = 0;
+  int b = 1;
+  for(size_t y = 0; *array != 42; ++y){
+    for(size_t x = 0; *array != 20; ++x){
+      if(b)
+	++w;
+      ++array;
+    }
+    ++h;
+    b = 0;
+  }
+  //struct tab; 
+  int *tab = calloc(20 * 20, sizeof (int*));
+  //Make a "zoom"
+  float divW = 0;
+  float divH = 0;
+// TRUC QUI SERT A RIEN PEUT ETRE REMPLACER PAR - 20
+  	divH = h/20;
+	if(h <= 20)
+		divH = 1 - divH;
+	else
+	  	divH -= 1;
+	divH *= 20;
+
+ 	divW = w/20;
+	if(w <= 20)
+    		divW = 1 - divW;
+	else
+	  	divW -= 1;
+   	divW *= 20;
+
+  if(h <= 20){
+     if(w <= 20){
+    	  	 
+       		for(int j = divH - divH/2; j < (h - divH/2); ++j){	 
+    			for(int i = divW - divW/2; i < (w - divW/2); ++i){
+      				tab[i + j] = *array;
+      				++array;
+  			}
+  		}
+  	}
+	else{
+	  //retrcicement en w
+	}
+  }
+  else{
+    //retrecicement en h
+
+  }
+
+}*/
+
+/*typedef struct Image{
+	int w,h;
+	Pixel* dat;
+}*/
+
+SDL_Surface* NouvelleImage(int *array, SDL_Surface* img){
+  SDL_Surface* newImg = img; 
+  size_t w = 0;
+  size_t h = 0;
+  int b = 1;
+  for(size_t y = 0; *array != 42; ++y){
+    for(size_t x = 0; *array != 20; ++x){
+      if(b)
+	++w;
+      ++array;
+    }
+    ++h;
+    b = 0;
+  }
+  size_t wRatio = img->w / w;
+  size_t hRatio =  img->h / h;
+  newImg = rotozoomSurfaceXY(newImg, 0, wRatio, hRatio, 0);
+  for(int y = 0; y < hRatio; y++)
+  {
+    for(int x = 0; x < wRatio; x++)
+      {
+	 float sum = arrayp[x + y];
+	 Uint32 p = SDL_MapRGB(newImg->format, sum, sum, sum);
+         putpixel(newImg, x, y, p);
+      }
+   }
+  wRatio = newImg->w / 20;
+  hRatio = newImg->h / 20;
+  newImg = rotozoomSurfavce(newImg, 0, wRatio, hRatio, 0);
+  return newImg;
+  //int SDL_SaveBMP(SDL_Surface *surface, const char *file);
+}
