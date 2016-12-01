@@ -34,7 +34,7 @@ struct Network
 struct TrainingData
 {
     float *trainingInputs;
-    int   res;
+    int    res;
     int   *desiredOutput;
 };
 

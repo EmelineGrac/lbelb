@@ -4,6 +4,7 @@
 #include <time.h>
 #include <string.h>
 
+#include "buildDB.h"
 #include "network.h"
 
 #ifndef PI
@@ -19,7 +20,7 @@
 #endif
 
 #ifndef DATABASE
-#define DATABASE "trainingData.bin"
+#define DATABASE "testData.bin"
 #endif
 
 #ifndef XOR
@@ -687,7 +688,8 @@ void randomInit(struct Network *n, int input, int hidden, int output)
 int* indexOutputToVector(int index, size_t len)
 {
     int *res = calloc(len, sizeof (int));
-    res[index] = 1;
+    if (index < (int)len)
+        res[index] = 1;
     return res;
 }
 
@@ -776,6 +778,8 @@ void buildResultFileTraining(struct Network      *n,
 
 int main()
 {
+// build database file
+    build();
 // Loading neural network, from a text file or randomly
     srand(time(NULL)); // for random
     struct Network *network = malloc(sizeof (struct Network));
@@ -793,7 +797,7 @@ int main()
     unsigned mini_batch_size = 2;
     float eta = 4.0;
 
-    int eval_during_training = 1; // 0 = FALSE
+    int eval_during_training = 0; // 0 = FALSE
 
 // Load trainingData from the binary file
     fileTD = fopen(DATABASE, "rb");
@@ -812,6 +816,7 @@ int main()
         printf("fileName: ");
         scanf("%s", fileName);
         openWeightsFile(network, fileName);
+        // in case of:
         if (network->nbNeurons[0] != (int)size_inputs) //bad
         {
             printf("Error on the number of neurons on the input layer: \
@@ -849,7 +854,7 @@ int main()
     else
         SGD(network, td, size_td, epochs, mini_batch_size, eta);
 
-//  printNetwork(network);
+// weights visualization: printNetwork(network);
 
 // Evaluation
     evalres = evaluate(network, td, size_td);
