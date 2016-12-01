@@ -48,17 +48,17 @@ SDL_Surface* display_image(SDL_Surface *img) {
     errx(1, "Couldn't set %dx%d video mode: %s\n",
          img->w, img->h, SDL_GetError());
   }
- 
+
   /* Blit onto the screen surface */
   if(SDL_BlitSurface(img, NULL, screen, NULL) < 0)
     warnx("BlitSurface error: %s\n", SDL_GetError());
- 
+
   // Update the screen
   SDL_UpdateRect(screen, 0, 0, img->w, img->h);
- 
+
   // wait for a key
   wait_for_keypressed();
- 
+
   // return the screen for further uses
   return screen;
 }
@@ -99,8 +99,8 @@ int main(int argc, char *argv [])
 
 
   	treatmentImag(argc, argv);
-	int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
-	array = NULL;
+//	int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
+//	array = NULL;
 	printf("\n");//Display
 	printf("End");
        	printf("\n");
