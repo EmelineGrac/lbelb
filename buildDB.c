@@ -17,7 +17,7 @@ void build()
   FILE *fileTD = fopen("testData.bin", "wb");
   size_t size_td = 364; //nb of images
   size_t size_inputs = 20*20;
-  size_t size_outputs = 52;
+  size_t size_outputs = 'z' - 'A';
 
   struct TrainingData *td = malloc(size_td * sizeof (struct TrainingData));
   size_t t = 0;
