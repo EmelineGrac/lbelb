@@ -15,27 +15,31 @@
 void build()
 {
   FILE *fileTD = fopen("testData.bin", "wb");
-  size_t size_td = 364; //nb of images
+  size_t size_td = 10009; //ls -lR | grep ".gif" | wc -l
   size_t size_inputs = 20*20;
   size_t size_outputs = 'z' - 'A';
 
   struct TrainingData *td = malloc(size_td * sizeof (struct TrainingData));
   size_t t = 0;
 
-  char path[] =
-  {'t','r','a','i','n','i','n','g','/','c','/','z','.','g','i','f','\0'};
+  char *path = calloc(255, sizeof (char));
+ // {'t','r','a','i','n','i','n','g','/','c','/'};
   char c = 'A';
-  char z = '0';
-
+  int z = 0;
+  FILE *f = NULL;
   while (c <= 'z')
   {
     if (c == 'Z' + 1)
       c = 'a';
     SDL_Surface *img = NULL;
-    path[9] = c;
-    for (z = '0'; z <= '6'; ++z)
+    // path[9] = c;
+    for (z = 0; z <= 201; ++z)
     {
-      path[11] = z;
+      sprintf(path, "training/%c/%d.gif", c, z);
+      // path[11] = z;
+      f = fopen(path, "rb");
+     if (f != NULL)
+     {
       img = load_image(path);
       int *arr = makeArray(img);
       float *arrf = calloc(20 * 20, sizeof (float));
@@ -47,9 +51,12 @@ void build()
       td[t].res = c - 'A';
       td[t].desiredOutput = indexOutputToVector(td[t].res, size_outputs);
       t++;
+      fclose(f);
+     }
     }
     c++;
   }
+  free(path);
   buildDataBase(fileTD, td, size_td, size_inputs, size_outputs);
   fclose(fileTD);
   freeMemoryTD(&td, size_td);
