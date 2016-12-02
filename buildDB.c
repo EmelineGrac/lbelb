@@ -11,7 +11,7 @@
 #include <string.h>
 
 #include "network.h"
-
+//find . -name "*.db" -type f -delete
 void build()
 {
   FILE *fileTD = fopen("testData.bin", "wb");
