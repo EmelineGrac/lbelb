@@ -4,6 +4,7 @@
 #include <time.h>
 #include <string.h>
 
+#include "buildDB.h"
 #include "network.h"
 
 #ifndef PI
@@ -11,15 +12,15 @@
 #endif
 
 #ifndef WEIGHTS_FILE
-#define WEIGHTS_FILE "tmp_weights"
+#define WEIGHTS_FILE "tmp_weights.txt"
 #endif
 
 #ifndef RESULTS_FILE
-#define RESULTS_FILE "tmp_results"
+#define RESULTS_FILE "tmp_results.txt"
 #endif
 
 #ifndef DATABASE
-#define DATABASE "trainingData.bin"
+#define DATABASE "testData.bin"
 #endif
 
 #ifndef XOR
@@ -149,12 +150,19 @@ size_t evaluate(struct Network      *n,
 {
  size_t res = 0;
  float *activations = NULL;
+ int high = 0;
 
  for (size_t i = 0; i < size_td; i++)
  {
    activations = feedforward(n, 1, td[i].trainingInputs);
-   if (highest(activations, n->layers[n->nbLayers - 1].nbNeurons) == td[i].res)
+   high = highest(activations, n->layers[n->nbLayers - 1].nbNeurons);
+   if (high == td[i].res)
      res++;
+   else
+   {
+     printf("%c was supposed to be %c\n",
+     outputIntToChar(high), outputIntToChar(td[i].res));
+   }
    free(activations);
  }
  return res;
@@ -406,7 +414,7 @@ void SGD_eval(struct Network      *n,
             update_mini_batch(n, begin, end, eta);
     }
     unsigned evalres = evaluate(n, td, size_td);
-    printf("Epoch %d: %d / %zu\n", j, evalres, size_td);
+    printf("Epoch %u: %u / %zu\n", j, evalres, size_td);
   }
 }
 
@@ -687,7 +695,8 @@ void randomInit(struct Network *n, int input, int hidden, int output)
 int* indexOutputToVector(int index, size_t len)
 {
     int *res = calloc(len, sizeof (int));
-    res[index] = 1;
+    if (index < (int)len)
+        res[index] = 1;
     return res;
 }
 
@@ -723,7 +732,7 @@ int specialTreatment(float input[])
 int outputIntToChar(int outputInt)
 {
   // CONVERT TO ASCII CODE
-  int c_res = outputInt + 32;
+  int c_res = outputInt + 'A';
   return c_res;
 }
 
@@ -776,6 +785,8 @@ void buildResultFileTraining(struct Network      *n,
 
 int main()
 {
+// build database file
+    build();
 // Loading neural network, from a text file or randomly
     srand(time(NULL)); // for random
     struct Network *network = malloc(sizeof (struct Network));
@@ -793,7 +804,7 @@ int main()
     unsigned mini_batch_size = 2;
     float eta = 4.0;
 
-    int eval_during_training = 1; // 0 = FALSE
+    int eval_during_training = 0; // 0 = FALSE
 
 // Load trainingData from the binary file
     fileTD = fopen(DATABASE, "rb");
@@ -812,6 +823,7 @@ int main()
         printf("fileName: ");
         scanf("%s", fileName);
         openWeightsFile(network, fileName);
+        // in case of:
         if (network->nbNeurons[0] != (int)size_inputs) //bad
         {
             printf("Error on the number of neurons on the input layer: \
@@ -849,7 +861,7 @@ int main()
     else
         SGD(network, td, size_td, epochs, mini_batch_size, eta);
 
-//  printNetwork(network);
+// weights visualization: printNetwork(network);
 
 // Evaluation
     evalres = evaluate(network, td, size_td);
