@@ -35,7 +35,7 @@ void build()
     // path[9] = c;
     for (z = 0; z <= 201; ++z)
     {
-      sprintf(path, "training/%c/%d.gif", c, z);
+      sprintf(path, "training/%d/%d.gif", c, z);
       // path[11] = z;
       f = fopen(path, "rb");
      if (f != NULL)
