@@ -16,7 +16,7 @@ int* makeArray(/*char *argv [],*/ SDL_Surface *img){
                             Uint32 p = getpixel(img, x, y);
                             Uint8 r, g, b;
                             SDL_GetRGB(p, img->format, &r, &g, &b);
-                            if(r == 255)
+                            if(r >= 128)
                                      *arrayX = 0;
                             else
                                      *arrayX = 1;

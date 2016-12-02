@@ -15,9 +15,9 @@
 void build()
 {
   FILE *fileTD = fopen("testData.bin", "wb");
-  size_t size_td = 4; //nb of images
+  size_t size_td = 364; //nb of images
   size_t size_inputs = 20*20;
-  size_t size_outputs = 2;
+  size_t size_outputs = 52;
 
   struct TrainingData *td = malloc(size_td * sizeof (struct TrainingData));
   size_t t = 0;
@@ -27,24 +27,21 @@ void build()
   char c = 'A';
   char z = '0';
 
-  while (c <= 'B')
+  while (c <= 'z')
   {
     if (c == 'Z' + 1)
       c = 'a';
-    SDL_Surface *img = malloc(sizeof (SDL_Surface));
+    SDL_Surface *img = NULL;
     path[9] = c;
-    for (z = '0'; z <= '1'; ++z)
+    for (z = '0'; z <= '6'; ++z)
     {
       path[11] = z;
       img = load_image(path);
-      int *arr = calloc(20 * 20, sizeof (int));
+      int *arr = makeArray(img);
       float *arrf = calloc(20 * 20, sizeof (float));
-      arr = makeArray(img);
       for (unsigned k = 0; k < 400; k++)
-      {
         arrf[k] = (float)arr[k];
-      }
-      free(img);
+      SDL_FreeSurface(img);
       free(arr);
       td[t].trainingInputs = arrf;
       td[t].res = c - 'A';
@@ -55,4 +52,6 @@ void build()
   }
   buildDataBase(fileTD, td, size_td, size_inputs, size_outputs);
   fclose(fileTD);
+  freeMemoryTD(&td, size_td);
+  free(td);
 }

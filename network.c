@@ -407,7 +407,7 @@ void SGD_eval(struct Network      *n,
             update_mini_batch(n, begin, end, eta);
     }
     unsigned evalres = evaluate(n, td, size_td);
-    printf("Epoch %d: %d / %zu\n", j, evalres, size_td);
+    printf("Epoch %u: %u / %zu\n", j, evalres, size_td);
   }
 }
 
