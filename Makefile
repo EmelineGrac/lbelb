@@ -24,4 +24,9 @@ clean:
 	rm -f *~ *.o
 	rm -f main
 
+cleantmp:
+	rm -f tmp_*
+
+fullclean: clean cleantmp
+
 # END

@@ -12,11 +12,11 @@
 #endif
 
 #ifndef WEIGHTS_FILE
-#define WEIGHTS_FILE "tmp_weights"
+#define WEIGHTS_FILE "tmp_weights.txt"
 #endif
 
 #ifndef RESULTS_FILE
-#define RESULTS_FILE "tmp_results"
+#define RESULTS_FILE "tmp_results.txt"
 #endif
 
 #ifndef DATABASE
@@ -150,12 +150,19 @@ size_t evaluate(struct Network      *n,
 {
  size_t res = 0;
  float *activations = NULL;
+ int high = 0;
 
  for (size_t i = 0; i < size_td; i++)
  {
    activations = feedforward(n, 1, td[i].trainingInputs);
-   if (highest(activations, n->layers[n->nbLayers - 1].nbNeurons) == td[i].res)
+   high = highest(activations, n->layers[n->nbLayers - 1].nbNeurons);
+   if (high == td[i].res)
      res++;
+   else
+   {
+     printf("%c was supposed to be %c\n",
+     outputIntToChar(high), outputIntToChar(td[i].res));
+   }
    free(activations);
  }
  return res;
