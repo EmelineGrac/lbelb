@@ -4,31 +4,20 @@
 #include <time.h>
 #include <string.h>
 
-# include <stdlib.h>
-# include <SDL/SDL.h>
-# include <SDL.h>
-# include <SDL/SDL_image.h>
-# include <err.h>
-# include "pixel_operations.h"
+#include <SDL/SDL.h>
+#include <SDL.h>
+#include <SDL/SDL_image.h>
+#include <err.h>
+
+#include "pixel_operations.h"
 #include "buildDB.h"
-#include "network.h"
 #include "main.h"
 #include "create_array.h"
 
+#include "network.h"
+
 #ifndef PI
 #define PI 3.14159265358979323846
-#endif
-
-#ifndef WEIGHTS_FILE
-#define WEIGHTS_FILE "tmp_weights.txt"
-#endif
-
-#ifndef RESULTS_FILE
-#define RESULTS_FILE "tmp_results.txt"
-#endif
-
-#ifndef DATABASE
-#define DATABASE "testData.bin"
 #endif
 
 #ifndef XOR

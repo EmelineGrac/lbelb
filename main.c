@@ -3,6 +3,7 @@
 #include "pixel_operations.h"
 #include <err.h>
 #include "create_array.h"
+#include "main.h"
 
 void wait_for_keypressed(void) {
   SDL_Event             event;

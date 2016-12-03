@@ -1,6 +1,18 @@
 # include <stdlib.h>
 # include <stdio.h>
 
+#ifndef WEIGHTS_FILE
+#define WEIGHTS_FILE "tmp_weights.txt"
+#endif
+
+#ifndef RESULTS_FILE
+#define RESULTS_FILE "tmp_results.txt"
+#endif
+
+#ifndef DATABASE
+#define DATABASE "testData.bin"
+#endif
+
 #ifndef NETWORK_H_
 #define NETWORK_H_
 

@@ -1,20 +1,23 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include "pixel_operations.h"
-#include <err.h>
-#include "create_array.h"
-#include "main.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 #include <string.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+#include <err.h>
 
+#include "pixel_operations.h"
+#include "create_array.h"
+#include "main.h"
 #include "network.h"
+
+#include "buildDB.h"
+
 //find . -name "*.db" -type f -delete
 void buildDatabaseFileFromImg()
 {
-  FILE *fileTD = fopen("testData.bin", "wb");
+  FILE *fileTD = fopen(DATABASE, "wb");
   size_t size_td = 10009; //ls -lR | grep ".gif" | wc -l
   size_t size_inputs = 20*20;
   size_t size_outputs = 'z' - 'A';
