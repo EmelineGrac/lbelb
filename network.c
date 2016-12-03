@@ -4,8 +4,16 @@
 #include <time.h>
 #include <string.h>
 
+# include <stdlib.h>
+# include <SDL/SDL.h>
+# include <SDL.h>
+# include <SDL/SDL_image.h>
+# include <err.h>
+# include "pixel_operations.h"
 #include "buildDB.h"
 #include "network.h"
+#include "main.h"
+#include "create_array.h"
 
 #ifndef PI
 #define PI 3.14159265358979323846
@@ -372,7 +380,22 @@ void SGD(struct Network      *n,
   struct TrainingData *begin = td;
   struct TrainingData *end   = td + size_td;
 
-  for (unsigned j = 0; j < epochs; j++)
+  for (unsigned j = 0; j < 1; j++)
+  {
+    clock_t t1 = clock();
+    begin = td;
+    for (; begin < end; begin += mini_batch_size)
+    {
+        if (begin + mini_batch_size <= end)
+            update_mini_batch(n, begin, begin + mini_batch_size, eta);
+        else
+            update_mini_batch(n, begin, end, eta);
+    }
+    clock_t t2 = clock();
+    double time_spent = (double)(t2 - t1) / CLOCKS_PER_SEC;
+    printf("Epoch takes %f seconds\n", time_spent);
+  }
+  for (unsigned j = 1; j < epochs; j++)
   {
     // random.shuffle(td);
     begin = td;
@@ -742,28 +765,34 @@ void buildResultFile(struct Network *n,
                      size_t          len,
                      char            fileName[])
 {
+if (inputs) {} // remove werror
+
   FILE* f = fopen(fileName, "w");
   size_t i = 0;
   int res = 0;
   int c_res = 0;
   float *arrf = NULL;
 
-  for (; i < len; i++)
+  for (; i < len; i++) // len of array 'inputs' returned by segmentation
   {
-     arrf = calloc(20 * 20, sizeof (float));
+    // convert to array of float
+     arrf = calloc(20*20, sizeof (float));
      for (unsigned k = 0; k < 400; k++)
-        arrf[k] = (float)inputs[i][k];
+        arrf[k] = 0.0;
+      //arrf[k] = (float)((inputs[i])[k]); //convert each value
+
      if (!isAcceptedByNeuralNetwork(arrf))
      {
         c_res = specialTreatment(arrf);
      }
      else
      {
-        res = test(n, arrf);
-        c_res = outputIntToChar(res);
+        res = test(n, arrf); // convert array to a single int
+        c_res = outputIntToChar(res); // convert the int result to char
      }
-     fputc(c_res, f);
+     fputc(c_res, f); // write the char in a file
      free(arrf);
+     arrf = NULL;
   }
   fputc('\n', f);
   fclose(f);
@@ -789,7 +818,27 @@ void buildResultFileTraining(struct Network      *n,
   fclose(f);
 }
 
-int main()
+/*
+** the true main function for OCR
+*/
+int main(int argc, char *argv[])
+{
+    struct Network *network = malloc(sizeof (struct Network));
+    openWeightsFile(network, "9724.txt"); //accuracy of 97%
+
+    init_sdl();
+    SDL_Surface* img = load_image(argv[1]);
+    treatmentImag(argc, argv);
+    int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
+
+    buildResultFile(network, array, 5/*len array*/, "test.txt");
+
+    SDL_FreeSurface(img);
+    freeMemoryNetwork(network);
+    free(network);
+}
+
+int main_learning()
 {
 // build database file
     buildDatabaseFileFromImg();
