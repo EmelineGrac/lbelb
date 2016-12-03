@@ -3,8 +3,8 @@
 
 int* makeArray(/*char *argv [],*/ SDL_Surface *img){
          //init_sdl();
-         //SDL_Surface* img = load_image(argv[1]);
-         //load_image(argv[1]);
+         //SDL_Surface* img = load_image(argv[2]);
+         //load_image(argv[2]);
          //MAKE THE ARRAY WITH 0 AND 1 ( WHITE PIXEL = 0 AND BLACK PIXEL = 1)
          int *array = NULL;
          array = malloc(sizeof(int) * ((img->h) * (img->w)));
@@ -21,7 +21,7 @@ int* makeArray(/*char *argv [],*/ SDL_Surface *img){
                             else
                                      *arrayX = 1;
                                   ++arrayX;
-                          }
+                  }
             }
 
    return array;
@@ -29,8 +29,8 @@ int* makeArray(/*char *argv [],*/ SDL_Surface *img){
 
 int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
          //init_sdl();
-         //SDL_Surface* img = load_image(argv[1]);
-         //load_image(argv[1]);
+         //SDL_Surface* img = load_image(argv[2]);
+         //load_image(argv[2]);
 
          // HERE INITIALIS OF THE MEMORY
          int **listLigne = NULL;
@@ -122,13 +122,13 @@ int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
 	 int **debutlistChar = listChar;
 	 int prem=2,temp=100,comp=0,lost=1;
          if (temp && comp)
-	 {}		 
+	 {}
 	 while (*debutListLigne != NULL){ //All line
                  int j=0, Bool=1, deb = 0,espace=0;
-		
+
                  while (j < img->w){  //One char
                          int i = j;
-			
+
 			 if(Bool){//Search for the beginning of the char
                                   while(*((*debutListLigne)+i) == 0){
                                          i+=img->w;
@@ -150,8 +150,8 @@ int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
 			 		{
 			   		temp = comp+1;
 			   		lost=0;
-			 		}	
-					comp=0;	
+			 		}
+					comp=0;
                                  }
                          }
                          else{  //Search for the end of the char
@@ -160,18 +160,18 @@ int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
                            }
                            if(*((*debutListLigne)+i)!=24){
                                    j++;
-				   
+
                            }
                            else{
 			     if(espace)
 			     {
 			       printf("espace\n");
-			       int *tabCharX = NULL;                              
+			       int *tabCharX = NULL;
 			       tabCharX= malloc(sizeof(int)*((img->h) * (img->w)));
 			       *tabCharX = 0;
 			       ++tabCharX;
 			       *tabCharX = 42;
-			       ++tabCharX;			       
+			       ++tabCharX;
 			       ++listChar;
 			     	espace=0;
 			     }
@@ -253,7 +253,7 @@ int* tabLetter(int* array){
 	    if(cpt == divW){
       	      tab[i + j] = *array;
       	      ++array;
-	      cpt = 0; 
+	      cpt = 0;
 	      }
 	    else{
 	      ++cpt;
@@ -292,7 +292,7 @@ int* tabLetter(int* array){
 	      if(cpt == divW){
       	        tab[i + j] = *array;
       	        ++array;
-	        cpt = 0; 
+	        cpt = 0;
 	      }
 	      else{
 	        ++cpt;

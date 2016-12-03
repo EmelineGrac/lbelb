@@ -9,7 +9,7 @@
 
 #include "pixel_operations.h"
 #include "create_array.h"
-#include "main.h"
+#include "imag.h"
 #include "network.h"
 
 #include "buildDB.h"
