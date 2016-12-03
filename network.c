@@ -4,8 +4,16 @@
 #include <time.h>
 #include <string.h>
 
+# include <stdlib.h>
+# include <SDL/SDL.h>
+# include <SDL.h>
+# include <SDL/SDL_image.h>
+# include <err.h>
+# include "pixel_operations.h"
 #include "buildDB.h"
 #include "network.h"
+#include "main.h"
+#include "create_array.h"
 
 #ifndef PI
 #define PI 3.14159265358979323846
@@ -757,28 +765,34 @@ void buildResultFile(struct Network *n,
                      size_t          len,
                      char            fileName[])
 {
+if (inputs) {} // remove werror
+
   FILE* f = fopen(fileName, "w");
   size_t i = 0;
   int res = 0;
   int c_res = 0;
   float *arrf = NULL;
 
-  for (; i < len; i++)
+  for (; i < len; i++) // len of array 'inputs' returned by segmentation
   {
-     arrf = calloc(20 * 20, sizeof (float));
+    // convert to array of float
+     arrf = calloc(20*20, sizeof (float));
      for (unsigned k = 0; k < 400; k++)
-        arrf[k] = (float)inputs[i][k];
+        arrf[k] = 0.0;
+      //arrf[k] = (float)((inputs[i])[k]); //convert each value
+
      if (!isAcceptedByNeuralNetwork(arrf))
      {
         c_res = specialTreatment(arrf);
      }
      else
      {
-        res = test(n, arrf);
-        c_res = outputIntToChar(res);
+        res = test(n, arrf); // convert array to a single int
+        c_res = outputIntToChar(res); // convert the int result to char
      }
-     fputc(c_res, f);
+     fputc(c_res, f); // write the char in a file
      free(arrf);
+     arrf = NULL;
   }
   fputc('\n', f);
   fclose(f);
@@ -804,7 +818,27 @@ void buildResultFileTraining(struct Network      *n,
   fclose(f);
 }
 
-int main()
+/*
+** the true main function for OCR
+*/
+int main(int argc, char *argv[])
+{
+    struct Network *network = malloc(sizeof (struct Network));
+    openWeightsFile(network, "9724.txt"); //accuracy of 97%
+
+    init_sdl();
+	SDL_Surface* img = load_image(argv[1]);
+  	treatmentImag(argc, argv);
+	int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
+
+	buildResultFile(network, array, 5/*len array*/, "test.txt");
+
+    SDL_FreeSurface(img);
+    freeMemoryNetwork(network);
+    free(network);
+}
+
+int main_learning()
 {
 // build database file
     buildDatabaseFileFromImg();
