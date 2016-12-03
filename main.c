@@ -100,14 +100,30 @@ int main(int argc, char *argv [])
 
   	treatmentImag(argc, argv);
 	int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
-	array = NULL;
-	if(array)
-	{}
+	//SDL_Surface* newImg = NouvelleImage(array[0], img);
+	printf("\n");
+	int *arrayX  = *array;
+	for(int i = 0; arrayX[i] != 42; ++i){
+	  for(int j = 0; arrayX[j] != 20; ++j){
+	    printf("%d", arrayX[i + j]);
+	  }
+	  printf("\n");
+	}
+
+	int* letter = tabLetter(array[0]);
+	for(int i = 0; i < 20; ++i){
+	  for(int j = 0; j < 20; ++j){
+	    printf("%d", letter[i + j]);
+	  }
+	  printf("\n");
+	}
 	printf("\n");//Display
 	printf("End");
        	printf("\n");
 
         display_image(img);
         SDL_FreeSurface(img);
+	//display_image(newImg);
+	//SDL_FreeSurface(newImg);
 	return 0;
 }
