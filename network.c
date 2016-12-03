@@ -786,7 +786,7 @@ void buildResultFileTraining(struct Network      *n,
 int main()
 {
 // build database file
-    build();
+    buildDatabaseFileFromImg();
 // Loading neural network, from a text file or randomly
     srand(time(NULL)); // for random
     struct Network *network = malloc(sizeof (struct Network));
