@@ -765,7 +765,7 @@ void buildResultFile(struct Network *n,
                      size_t          len,
                      char            fileName[])
 {
-if (inputs) {} // remove werror
+if (inputs){}//remove werror, inputs will be the array returned by segmentation
 
   FILE* f = fopen(fileName, "w");
   size_t i = 0;
@@ -776,7 +776,7 @@ if (inputs) {} // remove werror
   for (; i < len; i++) // len of array 'inputs' returned by segmentation
   {
     // convert to array of float
-     arrf = calloc(20*20, sizeof (float));
+     arrf = calloc(20*20, sizeof (float));//TODO resize
      for (unsigned k = 0; k < 400; k++)
         arrf[k] = 0.0;
       //arrf[k] = (float)((inputs[i])[k]); //convert each value
@@ -830,7 +830,7 @@ int main(int argc, char *argv[])
     SDL_Surface* img = load_image(argv[1]);
     treatmentImag(argc, argv);
     int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
-
+//TODO resize
     buildResultFile(network, array, 5/*len array*/, "test.txt");
 
     SDL_FreeSurface(img);
