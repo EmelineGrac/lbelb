@@ -4,31 +4,20 @@
 #include <time.h>
 #include <string.h>
 
-# include <stdlib.h>
-# include <SDL/SDL.h>
-# include <SDL.h>
-# include <SDL/SDL_image.h>
-# include <err.h>
-# include "pixel_operations.h"
+#include <SDL/SDL.h>
+#include <SDL.h>
+#include <SDL/SDL_image.h>
+#include <err.h>
+
+#include "pixel_operations.h"
 #include "buildDB.h"
-#include "network.h"
-#include "main.h"
+#include "imag.h"
 #include "create_array.h"
+
+#include "network.h"
 
 #ifndef PI
 #define PI 3.14159265358979323846
-#endif
-
-#ifndef WEIGHTS_FILE
-#define WEIGHTS_FILE "tmp_weights.txt"
-#endif
-
-#ifndef RESULTS_FILE
-#define RESULTS_FILE "tmp_results.txt"
-#endif
-
-#ifndef DATABASE
-#define DATABASE "testData.bin"
 #endif
 
 #ifndef XOR
@@ -821,13 +810,13 @@ void buildResultFileTraining(struct Network      *n,
 /*
 ** the true main function for OCR
 */
-int main(int argc, char *argv[])
+int OCR(int argc, char *argv[])
 {
     struct Network *network = malloc(sizeof (struct Network));
     openWeightsFile(network, "9724.txt"); //accuracy of 97%
 
     init_sdl();
-    SDL_Surface* img = load_image(argv[1]);
+    SDL_Surface* img = load_image(argv[2]);
     treatmentImag(argc, argv);
     int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
 //TODO resize
@@ -836,9 +825,10 @@ int main(int argc, char *argv[])
     SDL_FreeSurface(img);
     freeMemoryNetwork(network);
     free(network);
+    return 0;
 }
 
-int main_learning()
+int learning()
 {
 // build database file
     buildDatabaseFileFromImg();
@@ -938,7 +928,7 @@ int main_learning()
 }
 
 
-int main_xor()
+int Xor()
 {
 // Loading neural network, from a text file or randomly
     srand(time(NULL)); // for random
