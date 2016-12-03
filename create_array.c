@@ -120,21 +120,38 @@ int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
          int **listChar = NULL;
          listChar = malloc(sizeof(int*) * (img->h) * (img->w));
 	 int **debutlistChar = listChar;
-         while (*debutListLigne != NULL){ //All line
-                 int j=0, Bool=1, deb = 0;
-                 while (j < img->w){  //One line
+	 int prem=2,temp=100,comp=0,lost=1;
+         if (temp && comp)
+	 {}		 
+	 while (*debutListLigne != NULL){ //All line
+                 int j=0, Bool=1, deb = 0,espace=0;
+		
+                 while (j < img->w){  //One char
                          int i = j;
-                         if(Bool){//Search for the beginning of the char
+			
+			 if(Bool){//Search for the beginning of the char
                                   while(*((*debutListLigne)+i) == 0){
                                          i+=img->w;
                                  }
                                  if(*((*debutListLigne)+i) == 24){
                                          j++;
-                                 }
+					 comp++;
+				 }
                                  else{
                                          deb=j; //Find it
                                          Bool=0;
                                          j++;
+					// printf("\ncomp = %d et temp = %d\n",comp,temp);
+					 if(comp>temp)
+					 {
+					 espace=1;
+					 }
+					 if (prem == 0 && lost ==1)
+			 		{
+			   		temp = comp+1;
+			   		lost=0;
+			 		}	
+					comp=0;	
                                  }
                          }
                          else{  //Search for the end of the char
@@ -143,13 +160,27 @@ int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
                            }
                            if(*((*debutListLigne)+i)!=24){
                                    j++;
+				   
                            }
                            else{
+			     if(espace)
+			     {
+			       printf("espace\n");
+			       int *tabCharX = NULL;                              
+			       tabCharX= malloc(sizeof(int)*((img->h) * (img->w)));
+			       *tabCharX = 0;
+			       ++tabCharX;
+			       *tabCharX = 42;
+			       ++tabCharX;			       
+			       ++listChar;
+			     	espace=0;
+			     }
                              int fin=j; //find it
                              //Full the array of char
                              int *tabCharX = NULL;
                              tabCharX= malloc(sizeof(int)*((img->h) * (img->w)));
                              i=0;
+			     prem--;
                              while(*((*debutListLigne)+i)!=24 ){
                                   for(int k=deb;k<fin;k++){
                                      *tabCharX = *((*debutListLigne + i+k));
