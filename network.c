@@ -827,11 +827,11 @@ int main(int argc, char *argv[])
     openWeightsFile(network, "9724.txt"); //accuracy of 97%
 
     init_sdl();
-	SDL_Surface* img = load_image(argv[1]);
-  	treatmentImag(argc, argv);
-	int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
+    SDL_Surface* img = load_image(argv[1]);
+    treatmentImag(argc, argv);
+    int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
 
-	buildResultFile(network, array, 5/*len array*/, "test.txt");
+    buildResultFile(network, array, 5/*len array*/, "test.txt");
 
     SDL_FreeSurface(img);
     freeMemoryNetwork(network);
