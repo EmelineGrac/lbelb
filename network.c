@@ -738,7 +738,7 @@ int outputIntToChar(int outputInt)
 
 
 void buildResultFile(struct Network *n,
-                     float          *inputs[],
+                     int            *inputs[],
                      size_t          len,
                      char            fileName[])
 {
@@ -746,18 +746,24 @@ void buildResultFile(struct Network *n,
   size_t i = 0;
   int res = 0;
   int c_res = 0;
+  float *arrf = NULL;
+
   for (; i < len; i++)
   {
-     if (!isAcceptedByNeuralNetwork(inputs[i]))
+     arrf = calloc(20 * 20, sizeof (float));
+     for (unsigned k = 0; k < 400; k++)
+        arrf[k] = (float)inputs[i][k];
+     if (!isAcceptedByNeuralNetwork(arrf))
      {
-        c_res = specialTreatment(inputs[i]);
+        c_res = specialTreatment(arrf);
      }
      else
      {
-        res = test(n, inputs[i]);
+        res = test(n, arrf);
         c_res = outputIntToChar(res);
      }
      fputc(c_res, f);
+     free(arrf);
   }
   fputc('\n', f);
   fclose(f);

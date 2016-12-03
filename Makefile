@@ -13,7 +13,10 @@ SRC= pixel_operations.c main.c create_array.c
 OBJ= ${SRC:.c=.o}
 
 all: main
-	gcc -Wall -Wextra -std=c99 -g  network.c -o networkTest -lm
+	gcc -Wall -Wextra -std=c99 -g  network.c buildDB.c \
+	main.c create_array.c pixel_operations.c \
+	-o networkTest -lm \
+	${LDLIBS} ${CPPFLAGS} #marche pas car fonction main deja definie
 
 main: ${OBJ}
 
@@ -21,5 +24,10 @@ clean:
 	rm -f *~ *.o
 	rm -f main
 	rm -f networkTest
+
+cleantmp:
+	rm -f tmp_*
+
+fullclean: clean cleantmp
 
 # END
