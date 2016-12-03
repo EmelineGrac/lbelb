@@ -372,7 +372,22 @@ void SGD(struct Network      *n,
   struct TrainingData *begin = td;
   struct TrainingData *end   = td + size_td;
 
-  for (unsigned j = 0; j < epochs; j++)
+  for (unsigned j = 0; j < 1; j++)
+  {
+    clock_t t1 = clock();
+    begin = td;
+    for (; begin < end; begin += mini_batch_size)
+    {
+        if (begin + mini_batch_size <= end)
+            update_mini_batch(n, begin, begin + mini_batch_size, eta);
+        else
+            update_mini_batch(n, begin, end, eta);
+    }
+    clock_t t2 = clock();
+    double time_spent = (double)(t2 - t1) / CLOCKS_PER_SEC;
+    printf("Epoch takes %f seconds\n", time_spent);
+  }
+  for (unsigned j = 1; j < epochs; j++)
   {
     // random.shuffle(td);
     begin = td;
