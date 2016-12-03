@@ -18,7 +18,6 @@ main: ${OBJ}
 clean:
 	rm -f *~ *.o
 	rm -f main
-	rm -f networkTest
 
 cleantmp:
 	rm -f tmp_*
