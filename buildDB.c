@@ -12,7 +12,7 @@
 
 #include "network.h"
 //find . -name "*.db" -type f -delete
-void build()
+void buildDatabaseFileFromImg()
 {
   FILE *fileTD = fopen("testData.bin", "wb");
   size_t size_td = 10009; //ls -lR | grep ".gif" | wc -l

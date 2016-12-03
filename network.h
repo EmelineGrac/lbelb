@@ -96,7 +96,7 @@ int isAcceptedByNeuralNetwork(float input[]);
 int specialTreatment(float input[]);
 int outputIntToChar(int outputInt);
 void buildResultFile(struct Network *n,
-                     float          *inputs[],
+                     int            *inputs[],
                      size_t          len,
                      char            fileName[]);
 void buildResultFileTraining(struct Network      *n,
