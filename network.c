@@ -766,7 +766,7 @@ if (inputs){}//remove werror, inputs will be the array returned by segmentation
 
   for (; i < len; i++) // len of array 'inputs' returned by segmentation
   {
-     int *arr = makeArrayW1B0(load_image("training/81/1.gif"));
+     int *arr = makeArrayW1B0(load_image("training/81/1.gif"));//'Q'
    //int *arr = inputs[i];
      arrf = calloc(20*20, sizeof (float));//TODO resize
      for (unsigned k = 0; k < 400; k++)
@@ -819,9 +819,10 @@ int OCR(char *path)
     init_sdl();
     SDL_Surface* img = load_image(path);
     treatmentImag(path);
+    int len = 5;
     int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
-//TODO resize
-    buildResultFile(network, array, 5/*len array*/, OCR_RES);
+//TODO resize, len of the array returned by segmentation
+    buildResultFile(network, array, len/*of array*/, OCR_RES);
 
     SDL_FreeSurface(img);
     freeMemoryNetwork(network);
