@@ -22,5 +22,7 @@ int main(int argc, char *argv[])
     main_imag(argc, argv);
   if (arg == 2)
     OCR(argc, argv);
+  if (arg == 3)
+    learning();
   return 0;
 }
