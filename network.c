@@ -744,7 +744,7 @@ int specialTreatment(float input[])
 int outputIntToChar(int outputInt)
 {
   // CONVERT TO ASCII CODE
-  int c_res = outputInt + 'A';
+  int c_res = outputInt + ' ';
   return c_res;
 }
 
