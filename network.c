@@ -369,7 +369,7 @@ void SGD(struct Network      *n,
   struct TrainingData *begin = td;
   struct TrainingData *end   = td + size_td;
 
-  if (j != 0)
+  if (epochs > 0)
   {
     clock_t t1 = clock();
     begin = td;
@@ -832,7 +832,7 @@ int OCR(int argc, char *argv[])
 int learning()
 {
 // build database file
-    printf("Loading database...\n";
+    printf("Loading database...\n");
     buildDatabaseFileFromImg();
 // Loading neural network, from a text file or randomly
     srand(time(NULL)); // for random
@@ -897,11 +897,13 @@ int learning()
     printf("(SGD) Size of TrainingData: %zu\n", size_td);
     printf("epochs: ");
     scanf("%u", &epochs);
-    printf("mini_batch_size: ");
-    scanf("%u", &mini_batch_size);
-    printf("eta: ");
-    scanf("%f", &eta);
-
+    if (epochs > 0)
+    {
+      printf("mini_batch_size: ");
+      scanf("%u", &mini_batch_size);
+      printf("eta: ");
+      scanf("%f", &eta);
+    }
 // use SGD for learning
     if (eval_during_training)
         SGD_eval(network, td, size_td, epochs, mini_batch_size, eta);
