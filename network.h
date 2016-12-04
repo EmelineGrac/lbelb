@@ -1,6 +1,10 @@
 # include <stdlib.h>
 # include <stdio.h>
 
+#ifndef DEFAULT_WEIGHTS_FILE
+#define DEFAULT_WEIGHTS_FILE "361.txt"
+#endif
+
 #ifndef WEIGHTS_FILE
 #define WEIGHTS_FILE "tmp_weights.txt"
 #endif

@@ -611,6 +611,7 @@ void buildDataBase(FILE                *f,
 // Write data
     struct TrainingData *begin = td;
     struct TrainingData *end   = td + size_td;
+
     for (; begin < end; ++begin)
     {
         fwrite(begin->trainingInputs, sizeof (float), size_inputs,  f);
@@ -813,7 +814,7 @@ void buildResultFileTraining(struct Network      *n,
 int OCR(char *path)
 {
     struct Network *network = malloc(sizeof (struct Network));
-    openWeightsFile(network, "361.txt");
+    openWeightsFile(network, DEFAULT_WEIGHTS_FILE);
     // 361/364, 94 outputs, accuracy of 99.1 %
 
     init_sdl();

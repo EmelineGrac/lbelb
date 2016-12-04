@@ -14,16 +14,25 @@
 
 #include "buildDB.h"
 
+#ifndef IMG_PER_CHAR
+#define IMG_PER_CHAR 1
+#endif
+
+#ifndef NB_OUTPUTS
+#define NB_OUTPUTS 95
+#endif
+
 //find . -name "*.db" -type f -delete
+
 void buildDatabaseFileFromImg()
 {
   char begin = ' ';
   char end = '~';
 
   FILE *fileTD = fopen(DATABASE, "wb");
-  size_t size_td = 364; //10009 ls -lR | grep ".gif" | wc -l
+  size_t size_td = NB_OUTPUTS * IMG_PER_CHAR; //10009+ ls -lR | grep ".gif" | wc -l
   size_t size_inputs = 20*20;
-  size_t size_outputs = end - begin;
+  size_t size_outputs = NB_OUTPUTS;
 
   struct TrainingData *td = malloc(size_td * sizeof (struct TrainingData));
   size_t t = 0;
@@ -35,10 +44,8 @@ void buildDatabaseFileFromImg()
   FILE *f = NULL;
   while (c <= end)
   {
-    //if (c == 'Z' + 1)
-    //  c = 'a';
     SDL_Surface *img = NULL;
-    for (z = 0; z <= 6 /*201*/; ++z)
+    for (z = 0; z < IMG_PER_CHAR /*201*/; ++z)
     {
       sprintf(path, "training/%d/%d.gif", c, z);
       f = fopen(path, "rb");
