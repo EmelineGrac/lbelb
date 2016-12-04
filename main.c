@@ -17,12 +17,19 @@
 
 int main(int argc, char *argv[])
 {
-  unsigned arg = strtoul(argv[1], NULL, 10);
-  if (arg == 1)
-    main_imag(argc, argv);
-  if (arg == 2)
-    OCR(argc, argv);
-  if (arg == 3)
-    learning();
+  if (argc >= 1)
+  {
+    unsigned n = strtoul(argv[1], NULL, 10);
+    if (n == 3)
+      learning();
+    if (argc >= 2)
+    {
+      char *path = argv[2];
+      if (n == 1)
+        main_imag(path);
+      if (n == 2)
+        OCR(path);
+    }
+  }
   return 0;
 }

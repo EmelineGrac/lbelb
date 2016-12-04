@@ -64,14 +64,14 @@ SDL_Surface* display_image(SDL_Surface *img) {
   return screen;
 }
 
-void treatmentImag(int argc, char *argv []){
-	if(argc < 3)
-		errx(1, "pas d'image");
+void treatmentImag(char *path){
+	//if(argc < 3)
+	//	errx(1, "pas d'image");
 	float sum;
 	init_sdl();
-	SDL_Surface* img = load_image(argv[2]);
+	SDL_Surface* img = load_image(path);
 	display_image(img);
-	load_image(argv[2]);
+	load_image(path);
 	for(int y = 0; y < img->h; y++)
 	{
 		for(int x = 0; x < img->w; x++)
@@ -92,14 +92,14 @@ void treatmentImag(int argc, char *argv []){
 
 }
 
-int main_imag(int argc, char *argv [])
+int main_imag(char *path)
 {
   	init_sdl();
-	SDL_Surface* img = load_image(argv[2]);
-	load_image(argv[2]);
+	SDL_Surface* img = load_image(path);
+	load_image(path);
 
 
-  	treatmentImag(argc, argv);
+	treatmentImag(path);
 	int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
 	//SDL_Surface* newImg = NouvelleImage(array[0], img);
 	printf("\n");

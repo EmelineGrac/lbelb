@@ -811,14 +811,14 @@ void buildResultFileTraining(struct Network      *n,
 /*
 ** the true main function for OCR
 */
-int OCR(int argc, char *argv[])
+int OCR(char *path)
 {
     struct Network *network = malloc(sizeof (struct Network));
     openWeightsFile(network, "9724.txt"); //accuracy of 97%
 
     init_sdl();
-    SDL_Surface* img = load_image(argv[2]);
-    treatmentImag(argc, argv);
+    SDL_Surface* img = load_image(path);
+    treatmentImag(path);
     int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
 //TODO resize
     buildResultFile(network, array, 5/*len array*/, "test.txt");
