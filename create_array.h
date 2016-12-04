@@ -19,6 +19,7 @@
 
 
 int* makeArray(/*char *argv [],*/ SDL_Surface *surface);
+int* makeArrayW1B0(/*char *argv [],*/ SDL_Surface *surface);
 int** segmentation(int* array/*, char *argv []*/, SDL_Surface *surface);
 int* tabLetter(int *array);
 # endif
