@@ -15,7 +15,7 @@
 #include "buildDB.h"
 
 #ifndef IMG_PER_CHAR
-#define IMG_PER_CHAR 1
+#define IMG_PER_CHAR 50
 #endif
 
 #ifndef NB_OUTPUTS
@@ -30,7 +30,8 @@ void buildDatabaseFileFromImg()
   char end = '~';
 
   FILE *fileTD = fopen(DATABASE, "wb");
-  size_t size_td = NB_OUTPUTS * IMG_PER_CHAR; //10009+ ls -lR | grep ".gif" | wc -l
+  size_t size_td = NB_OUTPUTS * IMG_PER_CHAR;
+  //10009+ ls -lR | grep ".gif" | wc -l
   size_t size_inputs = 20*20;
   size_t size_outputs = NB_OUTPUTS;
 

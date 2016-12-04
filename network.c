@@ -815,14 +815,13 @@ int OCR(char *path)
 {
     struct Network *network = malloc(sizeof (struct Network));
     openWeightsFile(network, DEFAULT_WEIGHTS_FILE);
-    // 361/364, 94 outputs, accuracy of 99.1 %
 
     init_sdl();
     SDL_Surface* img = load_image(path);
     treatmentImag(path);
     int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
 //TODO resize
-    buildResultFile(network, array, 5/*len array*/, "test.txt");
+    buildResultFile(network, array, 5/*len array*/, OCR_RES);
 
     SDL_FreeSurface(img);
     freeMemoryNetwork(network);

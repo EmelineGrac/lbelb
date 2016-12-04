@@ -2,7 +2,8 @@
 # include <stdio.h>
 
 #ifndef DEFAULT_WEIGHTS_FILE
-#define DEFAULT_WEIGHTS_FILE "361.txt"
+#define DEFAULT_WEIGHTS_FILE "941.txt"
+// 941/950, 95 outputs, accuracy of 99 %
 #endif
 
 #ifndef WEIGHTS_FILE
@@ -15,6 +16,10 @@
 
 #ifndef DATABASE
 #define DATABASE "testData.bin"
+#endif
+
+#ifndef OCR_RES
+#define OCR_RES "document.txt"
 #endif
 
 #ifndef NETWORK_H_
