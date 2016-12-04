@@ -765,12 +765,11 @@ if (inputs){}//remove werror, inputs will be the array returned by segmentation
 
   for (; i < len; i++) // len of array 'inputs' returned by segmentation
   {
-    // convert to array of float
+     int *arr = makeArrayW1B0(load_image("training/81/1.gif"));
+   //int *arr = inputs[i];
      arrf = calloc(20*20, sizeof (float));//TODO resize
      for (unsigned k = 0; k < 400; k++)
-        arrf[k] = 0.0;
-      //arrf[k] = (float)((inputs[i])[k]); //convert each value
-
+       arrf[k] = (float)(arr[k]); //convert to array of float, each value
      if (!isAcceptedByNeuralNetwork(arrf))
      {
         c_res = specialTreatment(arrf);
@@ -814,7 +813,8 @@ void buildResultFileTraining(struct Network      *n,
 int OCR(char *path)
 {
     struct Network *network = malloc(sizeof (struct Network));
-    openWeightsFile(network, "9724.txt"); //accuracy of 97%
+    openWeightsFile(network, "361.txt");
+    // 361/364, 94 outputs, accuracy of 99.1 %
 
     init_sdl();
     SDL_Surface* img = load_image(path);

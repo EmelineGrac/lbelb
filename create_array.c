@@ -29,24 +29,34 @@ int* makeArray(/*char *argv [],*/ SDL_Surface *img){
 
 int* makeArrayW1B0(/*char *argv [],*/ SDL_Surface *img){
          //MAKE THE ARRAY WITH 0 AND 1 ( WHITE PIXEL = 1 AND BLACK PIXEL = 0)
-         int *array = NULL;
-         array = malloc(sizeof(int) * ((img->h) * (img->w)));
-         int *arrayX = array;
-          for(int y = 0; y < img->h; ++y)
-          {
-                  for(int x = 0; x < img->w; ++x)
-                  {
-                            Uint32 p = getpixel(img, x, y);
-                            Uint8 r, g, b;
-                            SDL_GetRGB(p, img->format, &r, &g, &b);
-                            if(r >= 128)
-                                     *arrayX = 0;
-                            else
-                                     *arrayX = 1;
-                                  ++arrayX;
-                  }
-            }
-
+    float sum;
+    int *array = NULL;
+    array = malloc(sizeof(int) * ((img->h) * (img->w)));
+    int *arrayX = array;
+	for(int y = 0; y < img->h; y++)
+	{
+		for(int x = 0; x < img->w; x++)
+		{
+			Uint32 p = getpixel(img, x, y);
+			Uint8 r, g, b;
+			SDL_GetRGB(p, img->format, &r, &g, &b);
+			sum = 0.3*(float)r + 0.59*(float)g + 0.11*(float)b;
+			// binarize the pictures
+			if(sum >= 128)
+				sum = 255;
+			else
+				sum = 0;
+			p = SDL_MapRGB(img->format, sum, sum, sum);
+			putpixel(img, x, y, p);
+            p = getpixel(img, x, y);
+            SDL_GetRGB(p, img->format, &r, &g, &b);
+            if(r >= 128)
+              *arrayX = 0;
+            else
+              *arrayX = 1;
+            ++arrayX;
+		}
+	}
    return array;
  }
 
