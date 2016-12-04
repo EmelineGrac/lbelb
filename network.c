@@ -369,7 +369,7 @@ void SGD(struct Network      *n,
   struct TrainingData *begin = td;
   struct TrainingData *end   = td + size_td;
 
-  for (unsigned j = 0; j < 1; j++)
+  if (j != 0)
   {
     clock_t t1 = clock();
     begin = td;
@@ -384,6 +384,7 @@ void SGD(struct Network      *n,
     double time_spent = (double)(t2 - t1) / CLOCKS_PER_SEC;
     printf("Epoch takes %f seconds\n", time_spent);
   }
+
   for (unsigned j = 1; j < epochs; j++)
   {
     // random.shuffle(td);
@@ -831,6 +832,7 @@ int OCR(int argc, char *argv[])
 int learning()
 {
 // build database file
+    printf("Loading database...\n";
     buildDatabaseFileFromImg();
 // Loading neural network, from a text file or randomly
     srand(time(NULL)); // for random
