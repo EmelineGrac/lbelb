@@ -3,6 +3,8 @@
 # ifndef CREATE_ARRAY_H_
 # define CREATE_ARRAY_H_
 
+# include <math.h>
+# include <stdio.h>
 # include <stdlib.h>
 # include <SDL/SDL.h>
 # include <SDL.h>

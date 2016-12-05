@@ -174,7 +174,7 @@ int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
                                          deb=j; //Find it
                                          Bool=0;
                                          j++;
-					// printf("\ncomp = %d et temp = %d\n",comp,temp);
+					//printf("\ncomp = %d et temp=%d\n",comp,temp);
 					 if(comp>temp)
 					 {
 					 espace=1;
@@ -250,10 +250,10 @@ int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
  }
 
 int* tabLetter(int* array){
-  size_t w = 0;
-  size_t h = 0;
+  int w = 0;
+  int h = 0;
   int b = 1;
-  for(size_t y = 0; *array != 42; ++y){
+  /*for(size_t y = 0; *array != 42; ++y){
     for(size_t x = 0; *array != 20; ++x){
       if(b)
 	++w;
@@ -262,13 +262,48 @@ int* tabLetter(int* array){
     ++array;
     ++h;
     b = 0;
+  }*/
+  for(int i = 0; array[i] != 42; ++i){
+    if(array[i] == 20){
+      ++h;
+      b = 0;
+    }
+    else{
+      if(b)
+      	++w;
+    }
   }
+  int* newArray = calloc(w * h, sizeof(int));
+  int cpt = 0;
+  for(int i = 0; array[i] != 42; ++i){
+    if(array[i] != 20){
+      newArray[cpt] = array[i];
+      ++cpt;
+    }
+  }
+  printf("value of h: %d \n", h);
+  printf("value of w: %d \n", w);
   //struct tab;
+  //int z = 0;
   int *tab = calloc(20 * 20, sizeof(int));
-  int divH = h / 20;
-  int divW = w / 20;
-  if(h <= 20){
+  //int divH = 0;
+  //int divW = 0;
+  double xRatio = w / (double)20;
+  double yRatio = h / (double)20;
+  double px, py;
+  for(int i = 0; i < 20; ++i){
+    for(int j = 0; j < 20; ++j){
+      px = floor(j * xRatio);
+      py = floor(i * yRatio);
+      //if( array[(int)((py * w) + px)] != 20)
+      tab[(i * 20) + j] = newArray[(int)((py * w) + px) ];
+    }
+  }
+  return tab;
+  /*if(h <= 20){
+    divH = 20 - h;
     if(w <= 20){
+      divW = 20 - w;
       for(int j = divH - divH/2; j < (int)(h - divH/2); ++j){
     	for(int i = divW - divW/2; i < (int)(w - divW/2); ++i){
       	  tab[i + j] = *array;
@@ -277,6 +312,7 @@ int* tabLetter(int* array){
       }
     }
     else{
+        divW = w / 20;
 	if(w / 20 > (float)divW){
 	  ++divW;
 	}
@@ -285,35 +321,40 @@ int* tabLetter(int* array){
     	  for(int i = 0; i < (int)w; ++i){
 	    if(cpt == divW){
       	      tab[i + j] = *array;
-      	      ++array;
 	      cpt = 0;
 	      }
 	    else{
 	      ++cpt;
 	    }
+      	    ++array;
   	  }
         }
     }
   }
   else{
+    divH = h / 20;
     if(h / 20 > (float)divH)
       ++divH;
     if(w <= 20){
+      divW = 20 - w;
     int cpth1 = 0;
     for(int j = 0; j < (int)h; ++j){
       if(cpth1 == divH){
       for(int i = divW - divW/2; i < (int)(w - divW/2); ++i){
       	tab[i + j] = *array;
-      	 ++array;
+      	++array;
   	}
       cpth1 = 0;
+      //++array;
       }
       else{
 	++cpth1;
       }
+      //++array;
     }
     }
     else{
+      divW = w / 20;
       if(w / 20 > (float)divW){
 	++divW;
       }
@@ -338,8 +379,7 @@ int* tabLetter(int* array){
 	  }
 	}
     }
-  }
-  return tab;
+  }*/
 }
 /*int* imgLetter(int* array){
   //Compute the dimension of the array
