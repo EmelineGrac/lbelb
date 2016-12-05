@@ -1,5 +1,5 @@
 # change application name here (executable output name)
-TARGET=window_main
+TARGET=real_window
  
 # compiler
 CC=gcc

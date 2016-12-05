@@ -51,9 +51,9 @@ int* makeArrayW1B0(/*char *argv [],*/ SDL_Surface *img){
             p = getpixel(img, x, y);
             SDL_GetRGB(p, img->format, &r, &g, &b);
             if(r >= 128)
-              *arrayX = 0;
-            else
               *arrayX = 1;
+            else
+              *arrayX = 0;
             ++arrayX;
 		}
 	}
@@ -162,7 +162,7 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
                                   while( *((*debutListLigne)+i) == 0){
                                          i+=img->w;
                                  }
-		   		//if(*((*debutListLigne)+i) == 42){ 	   
+		   		//if(*((*debutListLigne)+i) == 42){
                                  if( *((*debutListLigne)+i) == 24){
                                          j++;
 					 comp++;
@@ -183,7 +183,7 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
 			 		}
 					comp=0;
 				 }
-				
+
                          }
                          else{  //Search for the end of the char
                            while(*((*debutListLigne)+i)==0){

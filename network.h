@@ -2,7 +2,7 @@
 # include <stdio.h>
 
 #ifndef DEFAULT_WEIGHTS_FILE
-#define DEFAULT_WEIGHTS_FILE "4434.txt"
+#define DEFAULT_WEIGHTS_FILE "189.txt"
 // 4434/4750, 95 outputs, accuracy of 93 %
 #endif
 
