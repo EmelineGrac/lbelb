@@ -756,8 +756,6 @@ void buildResultFile(struct Network *n,
                      size_t          len,
                      char            fileName[])
 {
-if (inputs){}//remove werror, inputs will be the array returned by segmentation
-
   FILE* f = fopen(fileName, "w");
   size_t i = 0;
   int res = 0;
@@ -766,8 +764,15 @@ if (inputs){}//remove werror, inputs will be the array returned by segmentation
 
   for (; i < len; i++) // len of array 'inputs' returned by segmentation
   {
-     int *arr = makeArrayW1B0(load_image("training/81/1.gif"));//'Q'
-   //int *arr = inputs[i];
+  //   int *arr = makeArrayW1B0(load_image("training/81/1.gif"));//'Q'
+     int *arr = inputs[i];
+     printf("in buildresultfile:ocr: %zu \n", i);
+	for(int kk = 0; kk < 20 * 20; ++kk){
+	  printf("%d", arr[kk]);
+	  if(kk != 0 && (kk+1) % 20 == 0)
+	    printf("\n");
+	}
+	    printf("\n\n");
      arrf = calloc(20*20, sizeof (float));//TODO resize
      for (unsigned k = 0; k < 400; k++)
        arrf[k] = (float)(arr[k]); //convert to array of float, each value
@@ -820,7 +825,14 @@ int OCR(char *path)
     SDL_Surface* img = load_image(path);
     treatmentImag(path);
     int len = 0;
-    int** array = segmentation(makeArray(img), img, &len);
+    int i = 0;
+    int** arr = segmentation(makeArray(img), img, &len);
+    int **array = malloc(len * sizeof (int *));
+    for (i = 0; i < len; ++i)
+    {
+      array[i] = malloc(400 * sizeof (int));
+      array[i] = tabLetter(arr[i]);
+    }
 //TODO resize, len of the array returned by segmentation
     buildResultFile(network, array, len/*of array*/, OCR_RES);
 
