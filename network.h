@@ -126,5 +126,6 @@ void buildResultFileTraining(struct Network      *n,
                              char                 fileName[]);
 int OCR(char *path);
 int learning();
+int recog(char *path);
 int Xor();
 #endif /* NETWORK_H_ */
