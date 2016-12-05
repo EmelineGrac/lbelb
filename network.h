@@ -2,8 +2,8 @@
 # include <stdio.h>
 
 #ifndef DEFAULT_WEIGHTS_FILE
-#define DEFAULT_WEIGHTS_FILE "941.txt"
-// 941/950, 95 outputs, accuracy of 99 %
+#define DEFAULT_WEIGHTS_FILE "4434.txt"
+// 4434/4750, 95 outputs, accuracy of 93 %
 #endif
 
 #ifndef WEIGHTS_FILE
@@ -126,5 +126,6 @@ void buildResultFileTraining(struct Network      *n,
                              char                 fileName[]);
 int OCR(char *path);
 int learning();
+int recog(char *path);
 int Xor();
 #endif /* NETWORK_H_ */

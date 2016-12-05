@@ -150,8 +150,8 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
          listChar = malloc(sizeof(int*) * (img->h) * (img->w));
 	 int **debutlistChar = listChar;
 	 int prem=2,temp=100,comp=0,lost=1;
-         if (temp && comp)
-	 {}
+        // if (temp && comp)
+	 //{}
 	 while (*debutListLigne != NULL){ //All line
                  int j=0, Bool=1, deb = 0,espace=0;
 
@@ -159,10 +159,11 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
                          int i = j;
 
 			 if(Bool){//Search for the beginning of the char
-                                  while(*((*debutListLigne)+i) == 0){
+                                  while( *((*debutListLigne)+i) == 0){
                                          i+=img->w;
                                  }
-                                 if(*((*debutListLigne)+i) == 24){
+		   		//if(*((*debutListLigne)+i) == 42){ 	   
+                                 if( *((*debutListLigne)+i) == 24){
                                          j++;
 					 comp++;
 				 }
@@ -181,7 +182,8 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
 			   		lost=0;
 			 		}
 					comp=0;
-                                 }
+				 }
+				
                          }
                          else{  //Search for the end of the char
                            while(*((*debutListLigne)+i)==0){
@@ -209,7 +211,8 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
                              int fin=j; //find it
                              //Full the array of char
                              int *tabCharX = NULL;
-                             tabCharX= malloc(sizeof(int)*((img->h) * (img->w)));
+                             tabCharX= malloc(sizeof(int)*((img->h) * (img->w))
+                             * 2);
 			     int *tabCharXdebut = tabCharX;
                              i=0;
 			     prem--;
@@ -242,6 +245,9 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
          }
          ++listChar;
          *listChar = NULL;
+         //free(array);
+         //free(listLigne);
+         //free(tabListX);
 	 return debutlistChar;
  }
 
@@ -281,4 +287,4 @@ int* tabLetter(int* array){
     }
   }
   return tab;
-} 
+}

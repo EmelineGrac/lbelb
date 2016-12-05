@@ -936,6 +936,7 @@ int learning()
     buildResultFileTraining(network, td, size_td, RESULTS_FILE);
     printf("Print results in file '%s'\n", RESULTS_FILE);
 
+
 // Free memory
     freeMemoryTD(&td, size_td);
     free(td);
@@ -944,6 +945,28 @@ int learning()
     return 0;
 }
 
+int recog(char *path)
+{
+    struct Network *network = malloc(sizeof (struct Network));
+    openWeightsFile(network, DEFAULT_WEIGHTS_FILE);
+        char fileName[250];
+        printf("Save as: ");
+        scanf("%s", fileName);
+    init_sdl();
+    SDL_Surface* img = load_image(path);
+    treatmentImag(path);
+    int *farr = makeArrayW1B0(img);
+    float *farrf = calloc(20*20, sizeof (float));//TODO resize
+     for (unsigned k = 0; k < 400; k++)
+       farrf[k] = (float)(farr[k]); //convert to array of float, each value
+    FILE *fi = fopen(fileName, "w");
+    int fires = test(network, farrf); // convert array to a single int
+    char fic_res = outputIntToChar(fires); // convert the int result to char
+    fputc(fic_res, fi); // write the char in a file
+    fputc('\n', fi);
+    fclose(fi);
+    return 0;
+}
 
 int Xor()
 {
