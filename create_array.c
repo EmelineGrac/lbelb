@@ -159,10 +159,11 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
                          int i = j;
 
 			 if(Bool){//Search for the beginning of the char
-                                  while(*((*debutListLigne)+i) == 0){
+                                  while( *((*debutListLigne)+i) == 0){
                                          i+=img->w;
                                  }
-                                 if(*((*debutListLigne)+i) == 24){
+		   		//if(*((*debutListLigne)+i) == 42){ 	   
+                                 if( *((*debutListLigne)+i) == 24){
                                          j++;
 					 comp++;
 				 }
@@ -181,7 +182,8 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
 			   		lost=0;
 			 		}
 					comp=0;
-                                 }
+				 }
+				
                          }
                          else{  //Search for the end of the char
                            while(*((*debutListLigne)+i)==0){
