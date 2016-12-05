@@ -25,7 +25,7 @@
         /* Création du chemin complet pour accéder au fichier test.glade. */
         /* g_build_filename(); construit le chemin complet en fonction du système */
         /* d'exploitation. ( / pour Linux et \ pour Windows) */
-        filename =  g_build_filename ("window_main.glade", NULL);
+        filename =  g_build_filename ("test.glade", NULL);
 
         /* Chargement du fichier test.glade. */
         gtk_builder_add_from_file (data.builder, filename, &error);
@@ -43,7 +43,7 @@
 
         /* Récupération du pointeur de la fenêtre principale */
         fenetre_principale = GTK_WIDGET(gtk_builder_get_object (data.builder, "MainWindow"));
-
+       
 	g_signal_connect (G_OBJECT (fenetre_principale), "destroy", (GCallback)gtk_main_quit, NULL);
 
         /* Affichage de la fenêtre principale. */
