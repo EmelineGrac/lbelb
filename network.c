@@ -833,8 +833,7 @@ int OCR(char *path)
       array[i] = malloc(400 * sizeof (int));
       array[i] = tabLetter(arr[i]);
     }
-//TODO resize, len of the array returned by segmentation
-    buildResultFile(network, array, len/*of array*/, OCR_RES);
+    buildResultFile(network, array, len, OCR_RES);
 
     SDL_FreeSurface(img);
     freeMemoryNetwork(network);
@@ -845,8 +844,13 @@ int OCR(char *path)
 int learning()
 {
 // build database file
+    int *ipc = malloc(sizeof (int));
+    *ipc = 50;
+    printf("Number of pictures per char: ");
+    scanf("%d", ipc);
     printf("Loading database...\n");
-    buildDatabaseFileFromImg();
+    buildDatabaseFileFromImg(*ipc);
+    free(ipc);
 // Loading neural network, from a text file or randomly
     srand(time(NULL)); // for random
     struct Network *network = malloc(sizeof (struct Network));

@@ -13,24 +13,24 @@
 #include "network.h"
 
 #include "buildDB.h"
-
+/*
 #ifndef IMG_PER_CHAR
 #define IMG_PER_CHAR 50
 #endif
-
+*/
 #ifndef NB_OUTPUTS
 #define NB_OUTPUTS 95
 #endif
 
 //find . -name "*.db" -type f -delete
 
-void buildDatabaseFileFromImg()
+void buildDatabaseFileFromImg(int ipc)
 {
   char begin = ' ';
   char end = '~';
 
   FILE *fileTD = fopen(DATABASE, "wb");
-  size_t size_td = NB_OUTPUTS * IMG_PER_CHAR;
+  size_t size_td = NB_OUTPUTS * ipc;
   //10009+ ls -lR | grep ".gif" | wc -l
   size_t size_inputs = 20*20;
   size_t size_outputs = NB_OUTPUTS;
@@ -46,7 +46,7 @@ void buildDatabaseFileFromImg()
   while (c <= end)
   {
     SDL_Surface *img = NULL;
-    for (z = 0; z < IMG_PER_CHAR /*201*/; ++z)
+    for (z = 0; z < ipc /*201*/; ++z)
     {
       sprintf(path, "training/%d/%d.gif", c, z);
       f = fopen(path, "rb");
