@@ -819,8 +819,8 @@ int OCR(char *path)
     init_sdl();
     SDL_Surface* img = load_image(path);
     treatmentImag(path);
-    int len = 5;
-    int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
+    int len = 0;
+    int** array = segmentation(makeArray(img), img, &len);
 //TODO resize, len of the array returned by segmentation
     buildResultFile(network, array, len/*of array*/, OCR_RES);
 

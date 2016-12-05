@@ -60,11 +60,7 @@ int* makeArrayW1B0(/*char *argv [],*/ SDL_Surface *img){
    return array;
  }
 
-int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
-         //init_sdl();
-         //SDL_Surface* img = load_image(argv[2]);
-         //load_image(argv[2]);
-
+int** segmentation(int* array, SDL_Surface *img, int* len){
          // HERE INITIALIS OF THE MEMORY
          int **listLigne = NULL;
          listLigne = malloc(sizeof(int*) * (img->h));
@@ -200,13 +196,15 @@ int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
 			     {
 			       printf("espace\n");
 			       int *tabCharX = NULL;
-			       tabCharX= malloc(sizeof(int)*((img->h) * (img->w)));
+			       tabCharX= malloc(sizeof(int)*(img->h));
 			       *tabCharX = 0;
+			       *listChar = tabCharX;
 			       ++tabCharX;
 			       *tabCharX = 42;
 			       ++tabCharX;
 			       ++listChar;
 			     	espace=0;
+				++*len;
 			     }
                              int fin=j; //find it
                              //Full the array of char
@@ -235,6 +233,7 @@ int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
                              j=fin+1;
                              Bool=1;
 			     *listChar = tabCharXdebut;
+			     ++*len;
                              ++listChar;
                            }
                          }
@@ -244,25 +243,12 @@ int** segmentation(int* array/*, char *argv []*/, SDL_Surface *img){
          ++listChar;
          *listChar = NULL;
 	 return debutlistChar;
-         //free(listChar);
-         //free(listLigne);
-         //free(tabListX);
  }
 
 int* tabLetter(int* array){
   int w = 0;
   int h = 0;
   int b = 1;
-  /*for(size_t y = 0; *array != 42; ++y){
-    for(size_t x = 0; *array != 20; ++x){
-      if(b)
-	++w;
-      ++array;
-    }
-    ++array;
-    ++h;
-    b = 0;
-  }*/
   for(int i = 0; array[i] != 42; ++i){
     if(array[i] == 20){
       ++h;
@@ -281,13 +267,9 @@ int* tabLetter(int* array){
       ++cpt;
     }
   }
-  printf("value of h: %d \n", h);
-  printf("value of w: %d \n", w);
-  //struct tab;
-  //int z = 0;
+  //printf("value of h: %d \n", h);
+  //printf("value of w: %d \n", w);
   int *tab = calloc(20 * 20, sizeof(int));
-  //int divH = 0;
-  //int divW = 0;
   double xRatio = w / (double)20;
   double yRatio = h / (double)20;
   double px, py;
@@ -295,200 +277,8 @@ int* tabLetter(int* array){
     for(int j = 0; j < 20; ++j){
       px = floor(j * xRatio);
       py = floor(i * yRatio);
-      //if( array[(int)((py * w) + px)] != 20)
       tab[(i * 20) + j] = newArray[(int)((py * w) + px) ];
     }
   }
   return tab;
-  /*if(h <= 20){
-    divH = 20 - h;
-    if(w <= 20){
-      divW = 20 - w;
-      for(int j = divH - divH/2; j < (int)(h - divH/2); ++j){
-    	for(int i = divW - divW/2; i < (int)(w - divW/2); ++i){
-      	  tab[i + j] = *array;
-      	    ++array;
-  	}
-      }
-    }
-    else{
-        divW = w / 20;
-	if(w / 20 > (float)divW){
-	  ++divW;
-	}
-	int cpt = 0;
-	for(int j = divH - divH/2; j < (int)(h - divH/2); ++j){
-    	  for(int i = 0; i < (int)w; ++i){
-	    if(cpt == divW){
-      	      tab[i + j] = *array;
-	      cpt = 0;
-	      }
-	    else{
-	      ++cpt;
-	    }
-      	    ++array;
-  	  }
-        }
-    }
-  }
-  else{
-    divH = h / 20;
-    if(h / 20 > (float)divH)
-      ++divH;
-    if(w <= 20){
-      divW = 20 - w;
-    int cpth1 = 0;
-    for(int j = 0; j < (int)h; ++j){
-      if(cpth1 == divH){
-      for(int i = divW - divW/2; i < (int)(w - divW/2); ++i){
-      	tab[i + j] = *array;
-      	++array;
-  	}
-      cpth1 = 0;
-      //++array;
-      }
-      else{
-	++cpth1;
-      }
-      //++array;
-    }
-    }
-    else{
-      divW = w / 20;
-      if(w / 20 > (float)divW){
-	++divW;
-      }
-      int cpth = 0;
-      int cpt = 0;
-	for(int j = 0; j < (int)h; ++j){
-	  if(cpth == divH){
-    	    for(int i = 0; i < (int)w; ++i){
-	      if(cpt == divW){
-      	        tab[i + j] = *array;
-      	        ++array;
-	        cpt = 0;
-	      }
-	      else{
-	        ++cpt;
-	      }
-  	    }
-	   cpth = 0;
-	  }
-	  else{
-	    ++cpth;
-	  }
-	}
-    }
-  }*/
-}
-/*int* imgLetter(int* array){
-  //Compute the dimension of the array
-  size_t w = 0;
-  size_t h = 0;
-  int b = 1;
-  for(size_t y = 0; *array != 42; ++y){
-    for(size_t x = 0; *array != 20; ++x){
-      if(b)
-	++w;
-      ++array;
-    }
-    ++h;
-    b = 0;
-  }
-  //struct tab;
-  int *tab = calloc(20 * 20, sizeof (int*));
-  //Make a "zoom"
-  float divW = 0;
-  float divH = 0;
-// TRUC QUI SERT A RIEN PEUT ETRE REMPLACER PAR - 20
-  	divH = h/20;
-	if(h <= 20)
-		divH = 1 - divH;
-	else
-	  	divH -= 1;
-	divH *= 20;
-
- 	divW = w/20;
-	if(w <= 20)
-    		divW = 1 - divW;
-	else
-	  	divW -= 1;
-   	divW *= 20;
-
-  if(h <= 20){
-     if(w <= 20){
-
-       		for(int j = divH - divH/2; j < (h - divH/2); ++j){
-    			for(int i = divW - divW/2; i < (w - divW/2); ++i){
-      				tab[i + j] = *array;
-      				++array;
-  			}
-  		}
-  	}
-	else{
-	  //retrcicement en w
-	}
-  }
-  else{
-    //retrecicement en h
-
-  }
-
-}*/
-
-/*typedef struct Image{
-	int w,h;
-	Pixel* dat;
-}*/
-
-/*SDL_Surface* NouvelleImage(int *array, SDL_Surface* img){
-   SDL_Surface* newImg = img;
-  size_t w = 0;
-  size_t h = 0;
-  int b = 1;
-  for(size_t y = 0; *array != 42; ++y){
-    for(size_t x = 0; *array != 20; ++x){
-      if(b)
-	++w;
-      ++array;
-    }
-    ++h;
-    b = 0;
-  }
-  size_t wRatio = w / img->w ;
-  size_t hRatio = h / img->h;
-  newImg = rotozoomSurfaceXY(newImg, 0, wRatio, hRatio, 0);
-  for(int y = 0; y < hRatio; y++)
-  {
-    for(int x = 0; x < wRatio; x++)
-      {
-	 float sum = arrayp[x + y];
-	 Uint32 p = SDL_MapRGB(newImg->format, sum, sum, sum);
-         putpixel(newImg, x, y, p);
-      }
-   }
-  wRatio = 20 / newImg->w;
-  hRatio = 20 / newImg->h;
-  newImg = rotozoomSurfavce(newImg, 0, wRatio, hRatio, 0);
-  return newImg;
-  //int SDL_SaveBMP(SDL_Surface *surface, const char *file);
-}*/
-
-/*SDL_Surface* redimension(int *arraym SDL_Surface* img){
-  SDL_surface* newImg = img;
-  size_t w = 0;
-  size_t h = 0;
-  int b = 1;
-  for(size_t y = 0; *array != 42; ++y){
-    for(size_t x = 0; *array != 20; ++x){
-      if(b)
-	++w;
-      ++array;
-    }
-    ++h;
-    b = 0;
-  }
-  size_t wRatio = 20 / img->w;
-  size_t hRatio = 20 / img->h;
-  newImg = rotozoomSurfaceXY(newImg, 0, wRatio, hRatio, 0);
-}*/
+} 

@@ -12,15 +12,8 @@
 # include <err.h>
 # include "pixel_operations.h"
 
-/*struct tab {
-  int		color;
-  int		colom;
-  int		ligne;
-  struct tab	*next;
-}*/
-
-int* makeArray(/*char *argv [],*/ SDL_Surface *surface);
-int* makeArrayW1B0(/*char *argv [],*/ SDL_Surface *surface);
-int** segmentation(int* array/*, char *argv []*/, SDL_Surface *surface);
+int* makeArray(SDL_Surface *surface);
+int* makeArrayW1B0(SDL_Surface *surface);
+int** segmentation(int* array, SDL_Surface *surface, int* len);
 int* tabLetter(int *array);
 # endif

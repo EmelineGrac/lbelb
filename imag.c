@@ -94,13 +94,14 @@ void treatmentImag(char *path){
 
 int main_imag(char *path)
 {
+  	int len = 0;
   	init_sdl();
 	SDL_Surface* img = load_image(path);
 	load_image(path);
 	treatmentImag(path);
-	int** array = segmentation(makeArray(/*argv,*/ img)/*, argv*/, img);
-	//SDL_Surface* newImg = NouvelleImage(array[0], img);
+	int** array = segmentation(makeArray(img), img, &len);
 	printf("\n");
+	printf(" nombre de caractere : %d \n", len);
 	int *arrayX  = array[6];
 	printf("je print la premiere case de l'array: \n");
 	for(int i = 0; arrayX[i] != 42; ++i){
@@ -109,21 +110,13 @@ int main_imag(char *path)
 	  else
 	    printf("%d", arrayX[i]);
 	}
-
-	int* letter = tabLetter(array[5]);
+	printf("Apres redisionement : \n");
+	int* letter = tabLetter(array[6]);
 	for(int i = 0; i < 20 * 20; ++i){
 	  printf("%d", letter[i]);
 	  if(i != 0 && (i+1) % 20 == 0)
 	    printf("\n");
 	}
-	/*for(int i = 0; letter[i] != 42; ++i){
-	 // z = 0;
-	  if(letter[i] == 20)
-	    printf("\n");
-	  else
-	    printf("%d", letter[i]);
-	}*/
-
 	printf("\n");//Display
 	printf("End");
        	printf("\n");
