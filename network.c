@@ -762,18 +762,10 @@ void buildResultFile(struct Network *n,
   int c_res = 0;
   float *arrf = NULL;
 
-  for (; i < len; i++) // len of array 'inputs' returned by segmentation
+  for (; i < len; i++)
   {
-  //   int *arr = makeArrayW1B0(load_image("training/81/1.gif"));//'Q'
      int *arr = inputs[i];
-     printf("in buildresultfile:ocr: %zu \n", i);
-	for(int kk = 0; kk < 20 * 20; ++kk){
-	  printf("%d", arr[kk]);
-	  if(kk != 0 && (kk+1) % 20 == 0)
-	    printf("\n");
-	}
-	    printf("\n\n");
-     arrf = calloc(20*20, sizeof (float));//TODO resize
+     arrf = calloc(20*20, sizeof (float));
      for (unsigned k = 0; k < 400; k++)
        arrf[k] = (float)(arr[k]); //convert to array of float, each value
      if (!isAcceptedByNeuralNetwork(arrf))
