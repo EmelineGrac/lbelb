@@ -2,7 +2,7 @@
 # include <stdio.h>
 
 #ifndef DEFAULT_WEIGHTS_FILE
-#define DEFAULT_WEIGHTS_FILE "4628.txt"
+#define DEFAULT_WEIGHTS_FILE "4630.txt"
 // /4750, 95 outputs
 #endif
 
@@ -124,7 +124,7 @@ void buildResultFileTraining(struct Network      *n,
                              struct TrainingData  td[],
                              size_t               len,
                              char                 fileName[]);
-int OCR(char *path);
+int OCR(char *path, char *fileres);
 int learning();
 int recog(char *path);
 int Xor();

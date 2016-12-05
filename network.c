@@ -816,7 +816,7 @@ void buildResultFileTraining(struct Network      *n,
 /*
 ** the true main function for OCR
 */
-int OCR(char *path)
+int OCR(char *path, char *fileres)
 {
     struct Network *network = malloc(sizeof (struct Network));
     openWeightsFile(network, DEFAULT_WEIGHTS_FILE);
@@ -833,7 +833,7 @@ int OCR(char *path)
       array[i] = malloc(400 * sizeof (int));
       array[i] = tabLetter(arr[i]);
     }
-    buildResultFile(network, array, len, OCR_RES);
+    buildResultFile(network, array, len, fileres);
 
     SDL_FreeSurface(img);
     freeMemoryNetwork(network);

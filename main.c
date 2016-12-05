@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
       if (n == 1)
         main_imag(path);
       if (n == 2)
-        OCR(path);
+        OCR(path, OCR_RES);
       if (n == 4)
         recog(path);
     }
