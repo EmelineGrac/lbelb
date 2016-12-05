@@ -63,7 +63,7 @@ int* makeArrayW1B0(/*char *argv [],*/ SDL_Surface *img){
 int** segmentation(int* array, SDL_Surface *img, int* len){
          // HERE INITIALIS OF THE MEMORY
          int **listLigne = NULL;
-         listLigne = malloc(sizeof(int*) * (img->h) * 2);
+         listLigne = malloc(sizeof(int*) * (img->h));
          int **debutListLigne=listLigne;
          int cpt = 1, n = 1, b = 0, h = 0;
          if ( listLigne == NULL)
@@ -72,7 +72,7 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
          return NULL;
          }
          int *tabListX = NULL;
-         tabListX = malloc(sizeof(int) * ((img->h) * (img->w)) * 2);
+         tabListX = malloc(sizeof(int) * ((img->h) * (img->w)));
          int *arrayX = array;
          for(int y = 0; y < img->h; ++y)
          {
@@ -147,7 +147,7 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
          printf("\n");//Display
          //Char extraction
          int **listChar = NULL;
-         listChar = malloc(sizeof(int*) * (img->h) * (img->w) * 2);
+         listChar = malloc(sizeof(int*) * (img->h) * (img->w));
 	 int **debutlistChar = listChar;
 	 int prem=2,temp=100,comp=0,lost=1;
         // if (temp && comp)
@@ -196,7 +196,7 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
 			     {
 			       printf("espace\n");
 			       int *tabCharX = NULL;
-			       tabCharX= malloc(sizeof(int)*(img->h) * 2);
+			       tabCharX= malloc(sizeof(int)*(img->h));
 			       *tabCharX = 0;
 			       *listChar = tabCharX;
 			       ++tabCharX;
@@ -243,9 +243,9 @@ int** segmentation(int* array, SDL_Surface *img, int* len){
          }
          ++listChar;
          *listChar = NULL;
-         free(array);
-         free(listLigne);
-         free(tabListX);
+         //free(array);
+         //free(listLigne);
+         //free(tabListX);
 	 return debutlistChar;
  }
 
